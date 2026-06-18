@@ -54,7 +54,6 @@ final class external_test extends advanced_testcase {
             'allowcomment' => 1,
         ]);
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
-        
         $q1 = $generator->create_question($reflect->id, ['responsetype' => 'numeric']);
         $q2 = $generator->create_question($reflect->id, ['responsetype' => 'numeric']);
         $this->setUser($student);

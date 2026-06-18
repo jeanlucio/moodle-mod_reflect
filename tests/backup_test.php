@@ -27,6 +27,8 @@ namespace mod_reflect\tests;
 
 use advanced_testcase;
 
+
+
 /**
  * Backup and restore tests for mod_reflect.
  */
@@ -36,7 +38,10 @@ final class backup_test extends advanced_testcase {
      * @covers \backup_reflect_activity_task
      */
     public function test_backup_and_restore(): void {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -112,7 +117,7 @@ final class backup_test extends advanced_testcase {
             $srccourse->shortname . '_2',
             $srccourse->category
         );
-        
+
         $rc = new \restore_controller(
             $backupid,
             $newcourseid,
