@@ -1,0 +1,156 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_reflect/view_teacher
+
+    Teacher view for managing questions in a reflect activity.
+
+    Classes required for JS: none.
+    Data attributes required for JS: none.
+    Context variables required for this template:
+        * cmid - Course module ID.
+        * instanceid - Reflect instance ID.
+        * questions - Array of question objects.
+        * canmanage - Whether the user can add/edit/delete questions.
+        * noquestions - String for empty state.
+        * str_addquestion - String for add question button.
+        * str_editquestion - String for edit button.
+        * str_deletequestion - String for delete button.
+        * str_question - String for question label.
+        * str_responsetype - String for response type label.
+        * str_maxgrade - String for max grade label.
+        * str_responsetype_numeric - String for numeric type.
+        * str_responsetype_text - String for text type.
+        * str_save - String for save button.
+        * str_cancel - String for cancel button.
+        * str_confirmdelete - String for delete confirmation.
+
+    Example context (json):
+    {
+        "cmid": 42,
+        "instanceid": 7,
+        "questions": [
+            {
+                "id": 1,
+                "question": "<p>How confident are you?</p>",
+                "responsetype": "numeric",
+                "responsetypelabel": "Numeric (0–100 slider)",
+                "maxgrade": 100,
+                "sortorder": 0
+            }
+        ],
+        "canmanage": true,
+        "hasquestions": true,
+        "noquestions": "No questions have been added yet.",
+        "str_addquestion": "Add question",
+        "str_editquestion": "Edit question",
+        "str_deletequestion": "Delete question",
+        "str_question": "Reflection question",
+        "str_responsetype": "Response type",
+        "str_maxgrade": "Maximum grade for this question",
+        "str_responsetype_numeric": "Numeric (0–100 slider)",
+        "str_responsetype_text": "Open text",
+        "str_save": "Save",
+        "str_cancel": "Cancel",
+        "str_confirmdelete": "Are you sure?"
+    }
+}}
+<div id="mod-reflect-teacher" class="mod-reflect-container" data-cmid="{{cmid}}" data-instanceid="{{instanceid}}" data-confirmdelete="{{str_confirmdelete}}">
+
+    <div id="mod-reflect-questions-list">
+        {{#hasquestions}}
+            {{#questions}}
+                <div class="mod-reflect-question-card card mb-3" data-questionid="{{id}}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary me-2 ms-0">
+                                {{responsetypelabel}}
+                            </span>
+                            {{#canmanage}}
+                                <div>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary mod-reflect-edit-btn me-1"
+                                            data-questionid="{{id}}"
+                                            aria-label="{{str_editquestion}}">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger mod-reflect-delete-btn"
+                                            data-questionid="{{id}}"
+                                            aria-label="{{str_deletequestion}}">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            {{/canmanage}}
+                        </div>
+                        <div class="mod-reflect-question-text">{{{question}}}</div>
+                        <div class="text-muted small mt-1">
+                            {{str_maxgrade}}: {{maxgrade}}
+                        </div>
+                    </div>
+                </div>
+            {{/questions}}
+        {{/hasquestions}}
+
+        {{^hasquestions}}
+            <div class="alert alert-info" id="mod-reflect-empty-state">
+                {{{noquestions}}}
+            </div>
+        {{/hasquestions}}
+    </div>
+
+    {{#canmanage}}
+        <button type="button" class="btn btn-primary mt-3" id="mod-reflect-add-question-btn">
+            <i class="fa fa-plus" aria-hidden="true"></i> {{str_addquestion}}
+        </button>
+
+        <div id="mod-reflect-question-form" class="card mt-3" style="display: none;">
+            <div class="card-body">
+                <h5 class="card-title" id="mod-reflect-form-title">{{str_addquestion}}</h5>
+                <input type="hidden" id="mod-reflect-form-questionid" value="0">
+
+                <div class="mb-3">
+                    <label for="mod-reflect-form-question" class="form-label">{{str_question}}</label>
+                    <textarea id="mod-reflect-form-question" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mod-reflect-form-responsetype" class="form-label">{{str_responsetype}}</label>
+                    <select id="mod-reflect-form-responsetype" class="form-select form-control">
+                        <option value="numeric">{{str_responsetype_numeric}}</option>
+                        <option value="text">{{str_responsetype_text}}</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mod-reflect-form-maxgrade" class="form-label">{{str_maxgrade}}</label>
+                    <input type="number" id="mod-reflect-form-maxgrade" class="form-control"
+                           min="0" max="1000" step="1" value="0">
+                </div>
+
+                <div class="d-flex">
+                    <button type="button" class="btn btn-primary me-2" id="mod-reflect-save-question-btn">
+                        {{str_save}}
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="mod-reflect-cancel-question-btn">
+                        {{str_cancel}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {{/canmanage}}
+</div>

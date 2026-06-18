@@ -48,23 +48,13 @@ class mod_reflect_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'reflectsettings', get_string('reflectsettings', 'mod_reflect'));
 
-        $mform->addElement(
-            'editor',
-            'question_editor',
-            get_string('question', 'mod_reflect'),
-            ['rows' => 5],
-            ['maxfiles' => 0, 'context' => $this->context]
-        );
-        $mform->setType('question_editor', PARAM_RAW);
-        $mform->addRule('question_editor', null, 'required', null, 'client');
-        $mform->addHelpButton('question_editor', 'question', 'mod_reflect');
-
-        $responsetypes = [
-            'numeric' => get_string('responsetype_numeric', 'mod_reflect'),
-            'text'    => get_string('responsetype_text', 'mod_reflect'),
+        $grademethods = [
+            'manual'     => get_string('grademethod_manual', 'mod_reflect'),
+            'distribute' => get_string('grademethod_distribute', 'mod_reflect'),
         ];
-        $mform->addElement('select', 'responsetype', get_string('responsetype', 'mod_reflect'), $responsetypes);
-        $mform->setDefault('responsetype', 'numeric');
+        $mform->addElement('select', 'grademethod', get_string('grademethod', 'mod_reflect'), $grademethods);
+        $mform->setDefault('grademethod', 'manual');
+        $mform->addHelpButton('grademethod', 'grademethod', 'mod_reflect');
 
         $mform->addElement(
             'advcheckbox',
@@ -77,20 +67,5 @@ class mod_reflect_mod_form extends moodleform_mod {
         $this->standard_grading_coursemodule_elements();
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
-    }
-
-    /**
-     * Pre-process data before loading into the form.
-     *
-     * @param array $defaultvalues Default form values passed by reference.
-     * @return void
-     */
-    public function data_preprocessing(array &$defaultvalues): void {
-        if (!empty($defaultvalues['question']) && !empty($defaultvalues['questionformat'])) {
-            $defaultvalues['question_editor'] = [
-                'text'   => $defaultvalues['question'],
-                'format' => $defaultvalues['questionformat'],
-            ];
-        }
     }
 }

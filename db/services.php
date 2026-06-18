@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version details for mod_reflect.
+ * External service definitions for mod_reflect.
  *
  * @package mod_reflect
  * @copyright 2026 Jean Lúcio
@@ -24,9 +24,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_reflect';
-$plugin->version   = 2026061800;
-$plugin->requires  = 2024100700; // Moodle 4.5+.
-$plugin->supported = [405, 502];
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.2.0';
+$functions = [
+    'mod_reflect_save_question' => [
+        'classname'   => 'mod_reflect\external\save_question',
+        'methodname'  => 'execute',
+        'description' => 'Create or update a question in a reflect activity.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities' => 'mod/reflect:addinstance',
+    ],
+    'mod_reflect_delete_question' => [
+        'classname'   => 'mod_reflect\external\delete_question',
+        'methodname'  => 'execute',
+        'description' => 'Delete a question from a reflect activity.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities' => 'mod/reflect:addinstance',
+    ],
+];

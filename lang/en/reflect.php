@@ -26,15 +26,27 @@ defined('MOODLE_INTERNAL') || die();
 // phpcs:disable moodle.Files.LineLength
 
 $string['activityname'] = 'Activity name';
+$string['addquestion'] = 'Add question';
 $string['allowcomment'] = 'Allow comment';
 $string['allowcomment_help'] = 'When enabled, students can add an optional comment alongside their response.';
+$string['confirmdelete'] = 'Are you sure you want to delete this question? All student responses to it will also be deleted.';
+$string['deletequestion'] = 'Delete question';
+$string['editquestion'] = 'Edit question';
+$string['grademethod'] = 'Grade method';
+$string['grademethod_distribute'] = 'Distribute total grade equally';
+$string['grademethod_help'] = 'Choose how the grade is calculated. "Manual" lets you set a grade for each question individually. "Distribute" divides the total grade equally among all questions.';
+$string['grademethod_manual'] = 'Manual grade per question';
+$string['maxgrade'] = 'Maximum grade for this question';
 $string['modulename'] = 'Reflect';
-$string['modulename_help'] = 'The Reflect activity allows students to submit a self-assessment in response to a teacher-defined question. Supports numeric (0–100) and open-text responses with real-time autosave.';
+$string['modulename_help'] = 'The Reflect activity allows students to submit a self-assessment in response to teacher-defined questions. Supports numeric (0–100) and open-text responses with real-time autosave.';
 $string['modulenameplural'] = 'Reflect activities';
+$string['noquestions'] = 'No questions have been added yet. Click "Add question" to create the first one.';
 $string['pluginadministration'] = 'Reflect administration';
 $string['pluginname'] = 'Reflect';
 $string['question'] = 'Reflection question';
 $string['question_help'] = 'Write the self-assessment question or prompt that students will respond to.';
+$string['questiondeleted'] = 'Question deleted';
+$string['questionsaved'] = 'Question saved';
 $string['reflect:addinstance'] = 'Add a Reflect activity';
 $string['reflect:submit'] = 'Submit a response';
 $string['reflect:view'] = 'View a Reflect activity';

@@ -57,6 +57,7 @@ function reflect_update_instance(stdClass $data): bool {
 function reflect_delete_instance(int $id): bool {
     global $DB;
     $DB->delete_records('reflect_responses', ['reflectid' => $id]);
+    $DB->delete_records('reflect_questions', ['reflectid' => $id]);
     $DB->delete_records('reflect', ['id' => $id]);
     return true;
 }

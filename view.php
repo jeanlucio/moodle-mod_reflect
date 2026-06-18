@@ -30,14 +30,64 @@ $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $instance = $DB->get_record('reflect', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
-require_capability('mod/reflect:view', context_module::instance($cm->id));
+$context = context_module::instance($cm->id);
+require_capability('mod/reflect:view', $context);
 
 $PAGE->set_url('/mod/reflect/view.php', ['id' => $cm->id]);
 $PAGE->set_title($instance->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('incourse');
 
+$canmanage = has_capability('mod/reflect:addinstance', $context);
+
+// Load questions for this instance.
+$questions = $DB->get_records('reflect_questions', ['reflectid' => $instance->id], 'sortorder ASC');
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading($instance->name);
-echo $OUTPUT->notification(get_string('pluginname', 'mod_reflect') . get_string('underdevelopment', 'mod_reflect'), 'info');
+
+if ($canmanage) {
+    // Teacher view: manage questions inline.
+    $templatedata = [
+        'cmid'       => $cm->id,
+        'instanceid' => $instance->id,
+        'questions'  => [],
+        'hasquestions' => !empty($questions),
+        'canmanage'  => true,
+        'noquestions' => get_string('noquestions', 'mod_reflect'),
+        'str_addquestion'          => get_string('addquestion', 'mod_reflect'),
+        'str_editquestion'         => get_string('editquestion', 'mod_reflect'),
+        'str_deletequestion'       => get_string('deletequestion', 'mod_reflect'),
+        'str_question'             => get_string('question', 'mod_reflect'),
+        'str_responsetype'         => get_string('responsetype', 'mod_reflect'),
+        'str_maxgrade'             => get_string('maxgrade', 'mod_reflect'),
+        'str_responsetype_numeric' => get_string('responsetype_numeric', 'mod_reflect'),
+        'str_responsetype_text'    => get_string('responsetype_text', 'mod_reflect'),
+        'str_save'                 => get_string('savechanges'),
+        'str_cancel'               => get_string('cancel'),
+        'str_confirmdelete'        => get_string('confirmdelete', 'mod_reflect'),
+    ];
+
+    foreach ($questions as $q) {
+        $responsetypekey = 'responsetype_' . $q->responsetype;
+        $templatedata['questions'][] = [
+            'id'                => $q->id,
+            'question'          => format_text($q->question, $q->questionformat, ['context' => $context]),
+            'responsetype'      => $q->responsetype,
+            'responsetypelabel' => get_string($responsetypekey, 'mod_reflect'),
+            'maxgrade'          => (float) $q->maxgrade,
+            'sortorder'         => $q->sortorder,
+        ];
+    }
+
+    $PAGE->requires->js_call_amd('mod_reflect/manage_questions', 'init', [$cm->id]);
+    echo $OUTPUT->render_from_template('mod_reflect/view_teacher', $templatedata);
+} else {
+    // Student view: placeholder for upcoming implementation.
+    echo $OUTPUT->notification(
+        get_string('pluginname', 'mod_reflect') . get_string('underdevelopment', 'mod_reflect'),
+        'info'
+    );
+}
+
 echo $OUTPUT->footer();
