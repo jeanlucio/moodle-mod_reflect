@@ -23,7 +23,7 @@ The **Reflect Activity** is a modern self-assessment plugin for Moodle. It provi
 * 📊 **Gradebook Integration:** Real-time synchronization of numerical responses to the Moodle gradebook.
 * 🧮 **Grading Methods:** Choose between "Manual" (set maximum grade per question) or "Distribute" (divide the total activity grade equally among all questions).
 * 💬 **Global Comments:** Optional comment field for students to provide additional context.
-* 🎨 **Modern UX/UI:** Clean interface inspired by modern web forms, dropping Moodle's traditional heavy table layouts.
+* 🎨 **Modern UX/UI:** Clean interface inspired by modern web forms.
 * 🔒 **Privacy API Compliant:** Full support for Moodle's Privacy API (GDPR) for data export and deletion.
 
 ---
@@ -106,7 +106,7 @@ A atividade **Reflect** é um plugin moderno de autoavaliação para Moodle. For
 * 📊 **Integração com Livro de Notas:** Sincronização em tempo real das respostas numéricas com o gradebook do Moodle.
 * 🧮 **Métodos de Avaliação:** Escolha entre "Manual" (nota máxima definida por pergunta) ou "Distribuir" (divide a nota total da atividade igualmente entre as perguntas).
 * 💬 **Comentários Globais:** Campo opcional para que os estudantes adicionem contexto extra.
-* 🎨 **UX/UI Moderna:** Interface inspirada em formulários web modernos, abandonando os layouts pesados de tabela tradicionais do Moodle.
+* 🎨 **UX/UI Moderna:** Interface inspirada em formulários web modernos.
 * 🔒 **Conformidade com a API de Privacidade:** Suporte completo à API de Privacidade do Moodle (LGPD/GDPR) para exportação e exclusão de dados.
 
 ---
