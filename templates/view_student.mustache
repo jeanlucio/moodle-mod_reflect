@@ -52,13 +52,13 @@
 }}
 <div id="mod-reflect-student" class="mod-reflect-container" data-cmid="{{cmid}}" data-instanceid="{{instanceid}}">
 
+    {{#intro}}
     <div class="mod-reflect-header card mb-4">
         <div class="card-body">
-            {{#intro}}
-                <div class="mod-reflect-intro">{{{intro}}}</div>
-            {{/intro}}
+            <div class="mod-reflect-intro">{{{intro}}}</div>
         </div>
     </div>
+    {{/intro}}
 
     {{#hasquestions}}
         <div class="mod-reflect-questions-list">
