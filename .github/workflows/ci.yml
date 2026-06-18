@@ -106,7 +106,7 @@ jobs:
         run: |
           cd plugin
           npm install --no-save stylelint@15 postcss-scss stylelint-csstree-validator@3
-          npx stylelint "scss/**/*.scss"
+          npx stylelint "scss/**/*.scss" --allow-empty-input
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
