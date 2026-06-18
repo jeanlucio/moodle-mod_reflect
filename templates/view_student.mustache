@@ -71,12 +71,12 @@
                             <div class="mod-reflect-response-numeric mt-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2 text-muted small">
                                     <span>0</span>
-                                    <span class="mod-reflect-slider-value badge bg-primary">{{value}}</span>
+                                    <span class="mod-reflect-slider-value badge bg-primary">{{#value}}{{value}}{{/value}}{{^value}}0{{/value}}</span>
                                     <span>100</span>
                                 </div>
                                 <input type="range" class="form-range mod-reflect-slider" 
                                        id="reflect-slider-{{id}}" data-questionid="{{id}}" 
-                                       min="0" max="100" step="1" value="{{value}}">
+                                       min="0" max="100" step="1" value="{{#value}}{{value}}{{/value}}{{^value}}0{{/value}}">
                             </div>
                         {{/isnumeric}}
 

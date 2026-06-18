@@ -52,20 +52,20 @@ body.path-mod-reflect .mod-reflect-question-card .badge {
 body.path-mod-reflect .mod-reflect-header {
     border-top: 8px solid var(--primary, #0f6cbf);
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 body.path-mod-reflect .mod-reflect-question-card,
 body.path-mod-reflect .mod-reflect-comment-card {
     border-radius: 8px;
     border: 1px solid #dadce0;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.2s ease;
 }
 
 body.path-mod-reflect .mod-reflect-question-card:focus-within,
 body.path-mod-reflect .mod-reflect-comment-card:focus-within {
-    box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Custom Textarea for Student View (bottom border only) */
