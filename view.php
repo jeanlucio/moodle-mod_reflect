@@ -33,6 +33,15 @@ require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/reflect:view', $context);
 
+// Trigger course_module_viewed event.
+$event = \mod_reflect\event\course_module_viewed::create([
+    'objectid' => $instance->id,
+    'context'  => $context,
+]);
+$event->add_record_snapshot('course_modules', $cm);
+$event->add_record_snapshot('reflect', $instance);
+$event->trigger();
+
 $PAGE->set_url('/mod/reflect/view.php', ['id' => $cm->id]);
 $PAGE->set_title($instance->name);
 $PAGE->set_heading($course->fullname);
