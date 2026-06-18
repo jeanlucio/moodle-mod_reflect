@@ -30,8 +30,8 @@ class mod_reflect_generator extends testing_module_generator {
     /**
      * Create a new reflect instance.
      *
-     * @param array|stdClass $record
-     * @param array $options
+     * @param array|stdClass|null $record
+     * @param array|null $options
      * @return stdClass
      */
     public function create_instance($record = null, ?array $options = null) {
@@ -56,7 +56,7 @@ class mod_reflect_generator extends testing_module_generator {
      * Create a reflect question.
      *
      * @param int $reflectid
-     * @param array|stdClass $record
+     * @param array|stdClass|null $record
      * @return stdClass
      */
     public function create_question($reflectid, $record = null) {
