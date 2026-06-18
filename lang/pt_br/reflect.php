@@ -29,6 +29,7 @@ $string['activityname'] = 'Nome da atividade';
 $string['addquestion'] = 'Adicionar pergunta';
 $string['allowcomment'] = 'Permitir comentário';
 $string['allowcomment_help'] = 'Quando habilitado, os estudantes podem adicionar um comentário opcional junto à sua resposta.';
+$string['comment'] = 'Adicionar um comentário (opcional)';
 $string['confirmdelete'] = 'Tem certeza de que deseja excluir esta pergunta? Todas as respostas dos estudantes também serão excluídas.';
 $string['deletequestion'] = 'Excluir pergunta';
 $string['editquestion'] = 'Editar pergunta';

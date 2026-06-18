@@ -83,11 +83,30 @@ if ($canmanage) {
     $PAGE->requires->js_call_amd('mod_reflect/manage_questions', 'init', [$cm->id]);
     echo $OUTPUT->render_from_template('mod_reflect/view_teacher', $templatedata);
 } else {
-    // Student view: placeholder for upcoming implementation.
-    echo $OUTPUT->notification(
-        get_string('pluginname', 'mod_reflect') . get_string('underdevelopment', 'mod_reflect'),
-        'info'
-    );
+    // Student view.
+    $templatedata = [
+        'cmid'         => $cm->id,
+        'instanceid'   => $instance->id,
+        'intro'        => format_module_intro('reflect', $instance, $cm->id),
+        'allowcomment' => (bool)$instance->allowcomment,
+        'hasquestions' => !empty($questions),
+        'questions'    => [],
+        'str_noquestions' => get_string('noquestions', 'mod_reflect'),
+        'str_comment'     => get_string('comment', 'mod_reflect') ?? 'Comentário',
+    ];
+
+    foreach ($questions as $q) {
+        $templatedata['questions'][] = [
+            'id'        => $q->id,
+            'question'  => format_text($q->question, $q->questionformat, ['context' => $context]),
+            'isnumeric' => $q->responsetype === 'numeric',
+            'istext'    => $q->responsetype === 'text',
+        ];
+    }
+
+    // Load JS module for autosave (to be created next).
+    $PAGE->requires->js_call_amd('mod_reflect/autosave', 'init', [$cm->id]);
+    echo $OUTPUT->render_from_template('mod_reflect/view_student', $templatedata);
 }
 
 echo $OUTPUT->footer();

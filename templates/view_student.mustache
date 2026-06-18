@@ -1,0 +1,119 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_reflect/view_student
+
+    Student view for responding to a reflect activity.
+
+    Classes required for JS: none.
+    Data attributes required for JS: none.
+    Context variables required for this template:
+        * cmid - Course module ID.
+        * instanceid - Reflect instance ID.
+        * intro - The activity description.
+        * questions - Array of question objects.
+        * allowcomment - Boolean whether comments are allowed globally.
+        * hasquestions - Boolean if there are questions to display.
+        * str_noquestions - String for no questions.
+        * str_comment - String for comment label.
+
+    Example context (json):
+    {
+        "cmid": 42,
+        "instanceid": 7,
+        "intro": "<p>Reflect on your learning today.</p>",
+        "questions": [
+            {
+                "id": 1,
+                "question": "<p>How confident are you?</p>",
+                "isnumeric": true,
+                "istext": false
+            }
+        ],
+        "allowcomment": true,
+        "hasquestions": true,
+        "str_noquestions": "No questions have been configured yet.",
+        "str_comment": "Add a comment (optional)"
+    }
+}}
+<div id="mod-reflect-student" class="mod-reflect-container" data-cmid="{{cmid}}" data-instanceid="{{instanceid}}">
+
+    <div class="mod-reflect-header card mb-4">
+        <div class="card-body">
+            {{#intro}}
+                <div class="mod-reflect-intro">{{{intro}}}</div>
+            {{/intro}}
+        </div>
+    </div>
+
+    {{#hasquestions}}
+        <div class="mod-reflect-questions-list">
+            {{#questions}}
+                <div class="mod-reflect-question-card card mb-4" data-questionid="{{id}}">
+                    <div class="card-body">
+                        <div class="mod-reflect-question-text mb-4">{{{question}}}</div>
+
+                        {{#isnumeric}}
+                            <div class="mod-reflect-response-numeric mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2 text-muted small">
+                                    <span>0</span>
+                                    <span class="mod-reflect-slider-value badge bg-primary">0</span>
+                                    <span>100</span>
+                                </div>
+                                <input type="range" class="form-range mod-reflect-slider" 
+                                       id="reflect-slider-{{id}}" data-questionid="{{id}}" 
+                                       min="0" max="100" step="1" value="0">
+                            </div>
+                        {{/isnumeric}}
+
+                        {{#istext}}
+                            <div class="mod-reflect-response-text mt-3">
+                                <textarea class="form-control mod-reflect-textarea" 
+                                          id="reflect-text-{{id}}" data-questionid="{{id}}" 
+                                          rows="4" placeholder="Sua resposta..."></textarea>
+                            </div>
+                        {{/istext}}
+
+                        <div class="mod-reflect-save-status text-muted small mt-2 d-none">
+                            <i class="fa fa-circle-o-notch fa-spin"></i> <span class="status-text">Salvando...</span>
+                        </div>
+                    </div>
+                </div>
+            {{/questions}}
+
+            {{#allowcomment}}
+                <div class="mod-reflect-comment-card card mb-4">
+                    <div class="card-body">
+                        <label for="reflect-global-comment" class="form-label">{{str_comment}}</label>
+                        <textarea class="form-control mod-reflect-global-comment" 
+                                  id="reflect-global-comment" rows="3"></textarea>
+                        <div class="mod-reflect-save-status text-muted small mt-2 d-none">
+                            <i class="fa fa-circle-o-notch fa-spin"></i> <span class="status-text">Salvando...</span>
+                        </div>
+                    </div>
+                </div>
+            {{/allowcomment}}
+        </div>
+    {{/hasquestions}}
+
+    {{^hasquestions}}
+        <div class="alert alert-info">
+            {{str_noquestions}}
+        </div>
+    {{/hasquestions}}
+
+</div>

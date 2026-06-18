@@ -29,6 +29,7 @@ $string['activityname'] = 'Activity name';
 $string['addquestion'] = 'Add question';
 $string['allowcomment'] = 'Allow comment';
 $string['allowcomment_help'] = 'When enabled, students can add an optional comment alongside their response.';
+$string['comment'] = 'Add a comment (optional)';
 $string['confirmdelete'] = 'Are you sure you want to delete this question? All student responses to it will also be deleted.';
 $string['deletequestion'] = 'Delete question';
 $string['editquestion'] = 'Edit question';
