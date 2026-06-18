@@ -66,9 +66,9 @@ function reflect_delete_instance(int $id): bool {
  * Return the features supported by this module.
  *
  * @param string $feature FEATURE_xx constant for requested feature.
- * @return bool|null True if supported, false if not, null if unknown.
+ * @return mixed True if supported, false if not, null if unknown. String for purpose.
  */
-function reflect_supports(string $feature): bool|null {
+function reflect_supports(string $feature): mixed {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -78,6 +78,8 @@ function reflect_supports(string $feature): bool|null {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_ASSESSMENT;
         default:
             return null;
     }
