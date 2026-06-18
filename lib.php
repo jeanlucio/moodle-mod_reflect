@@ -32,7 +32,10 @@ function reflect_add_instance(stdClass $data): int {
     global $DB;
     $data->timecreated  = time();
     $data->timemodified = time();
-    return $DB->insert_record('reflect', $data);
+    $id = $DB->insert_record('reflect', $data);
+    $data->id = $id;
+    reflect_grade_item_update($data);
+    return $id;
 }
 
 /**
@@ -45,7 +48,11 @@ function reflect_update_instance(stdClass $data): bool {
     global $DB;
     $data->id           = $data->instance;
     $data->timemodified = time();
-    return $DB->update_record('reflect', $data);
+    $result = $DB->update_record('reflect', $data);
+    reflect_grade_item_update($data);
+    // Recalculate grades if the settings changed.
+    reflect_update_grades($data);
+    return $result;
 }
 
 /**
@@ -83,4 +90,93 @@ function reflect_supports(string $feature): mixed {
         default:
             return null;
     }
+}
+
+/**
+ * Create or update the grade item for given reflect instance.
+ *
+ * @param stdClass $instance
+ * @param mixed $grades
+ * @return int 0 if ok, error code otherwise
+ */
+function reflect_grade_item_update($instance, $grades = null) {
+    global $CFG;
+    require_once($CFG->libdir . '/gradelib.php');
+
+    $params = ['itemname' => $instance->name, 'idnumber' => $instance->idnumber ?? ''];
+
+    if ($instance->grade > 0) {
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax']  = $instance->grade;
+        $params['grademin']  = 0;
+    } else {
+        $params['gradetype'] = GRADE_TYPE_NONE;
+    }
+
+    return grade_update('mod/reflect', $instance->course, 'mod', 'reflect', $instance->id, 0, $grades, $params);
+}
+
+/**
+ * Update grades in the gradebook.
+ *
+ * @param stdClass $instance
+ * @param int $userid Update grade of specific user only.
+ * @param bool $nullifnone If true and no responses found, set grade to null.
+ */
+function reflect_update_grades($instance, int $userid = 0, bool $nullifnone = true) {
+    global $DB;
+
+    if ($instance->grade == 0) {
+        reflect_grade_item_update($instance);
+        return;
+    }
+
+    $sql = "SELECT userid FROM {reflect_responses} WHERE reflectid = :rid GROUP BY userid";
+    $params = ['rid' => $instance->id];
+    if ($userid) {
+        $sql .= " HAVING userid = :uid";
+        $params['uid'] = $userid;
+    }
+
+    $users = $DB->get_records_sql($sql, $params);
+    $grades = [];
+
+    // We must fetch questions to know their maxgrade and count.
+    $questions = $DB->get_records('reflect_questions', ['reflectid' => $instance->id]);
+    $totalquestions = count($questions);
+
+    foreach ($users as $u) {
+        $responses = $DB->get_records('reflect_responses', ['reflectid' => $instance->id, 'userid' => $u->userid]);
+        $totalscore = 0.0;
+
+        foreach ($responses as $resp) {
+            if ($resp->value === null) {
+                continue;
+            }
+            if (isset($questions[$resp->questionid])) {
+                $q = $questions[$resp->questionid];
+                if ($q->responsetype === 'numeric') {
+                    if ($instance->grademethod === 'manual') {
+                        $totalscore += ($resp->value / 100) * $q->maxgrade;
+                    } else if ($instance->grademethod === 'distribute' && $totalquestions > 0) {
+                        $weight = $instance->grade / $totalquestions;
+                        $totalscore += ($resp->value / 100) * $weight;
+                    }
+                }
+            }
+        }
+
+        $grades[$u->userid] = new stdClass();
+        $grades[$u->userid]->userid = $u->userid;
+        $grades[$u->userid]->rawgrade = $totalscore;
+    }
+
+    if (empty($grades) && $nullifnone && $userid) {
+        // Force update to null if specific user requested but has no responses.
+        $grades[$userid] = new stdClass();
+        $grades[$userid]->userid = $userid;
+        $grades[$userid]->rawgrade = null;
+    }
+
+    reflect_grade_item_update($instance, $grades);
 }

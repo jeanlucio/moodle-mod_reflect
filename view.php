@@ -95,14 +95,37 @@ if ($canmanage) {
         'str_comment'     => get_string('comment', 'mod_reflect') ?? 'Comentário',
     ];
 
+    // Load user's existing responses.
+    $responses = $DB->get_records(
+        'reflect_responses',
+        ['reflectid' => $instance->id, 'userid' => $USER->id],
+        '',
+        'questionid, value, responsetext, comment'
+    );
+    $globalcomment = '';
+
     foreach ($questions as $q) {
+        $val = 0;
+        $text = '';
+        if (isset($responses[$q->id])) {
+            $val = $responses[$q->id]->value !== null ? (float)$responses[$q->id]->value : 0;
+            $text = $responses[$q->id]->responsetext ?? '';
+            if (!empty($responses[$q->id]->comment)) {
+                $globalcomment = $responses[$q->id]->comment;
+            }
+        }
+
         $templatedata['questions'][] = [
             'id'        => $q->id,
             'question'  => format_text($q->question, $q->questionformat, ['context' => $context]),
             'isnumeric' => $q->responsetype === 'numeric',
             'istext'    => $q->responsetype === 'text',
+            'value'     => $val,
+            'text'      => $text,
         ];
     }
+
+    $templatedata['globalcomment'] = $globalcomment;
 
     // Load JS module for autosave (to be created next).
     $PAGE->requires->js_call_amd('mod_reflect/autosave', 'init', [$cm->id]);

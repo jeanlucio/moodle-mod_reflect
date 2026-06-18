@@ -71,12 +71,12 @@
                             <div class="mod-reflect-response-numeric mt-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2 text-muted small">
                                     <span>0</span>
-                                    <span class="mod-reflect-slider-value badge bg-primary">0</span>
+                                    <span class="mod-reflect-slider-value badge bg-primary">{{value}}</span>
                                     <span>100</span>
                                 </div>
                                 <input type="range" class="form-range mod-reflect-slider" 
                                        id="reflect-slider-{{id}}" data-questionid="{{id}}" 
-                                       min="0" max="100" step="1" value="0">
+                                       min="0" max="100" step="1" value="{{value}}">
                             </div>
                         {{/isnumeric}}
 
@@ -84,7 +84,7 @@
                             <div class="mod-reflect-response-text mt-3">
                                 <textarea class="form-control mod-reflect-textarea" 
                                           id="reflect-text-{{id}}" data-questionid="{{id}}" 
-                                          rows="4" placeholder="Sua resposta..."></textarea>
+                                          rows="4" placeholder="Sua resposta...">{{text}}</textarea>
                             </div>
                         {{/istext}}
 
@@ -100,7 +100,7 @@
                     <div class="card-body">
                         <label for="reflect-global-comment" class="form-label">{{str_comment}}</label>
                         <textarea class="form-control mod-reflect-global-comment" 
-                                  id="reflect-global-comment" rows="3"></textarea>
+                                  id="reflect-global-comment" rows="3">{{globalcomment}}</textarea>
                         <div class="mod-reflect-save-status text-muted small mt-2 d-none">
                             <i class="fa fa-circle-o-notch fa-spin"></i> <span class="status-text">Salvando...</span>
                         </div>

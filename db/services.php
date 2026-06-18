@@ -41,4 +41,12 @@ $functions = [
         'ajax'        => true,
         'capabilities' => 'mod/reflect:addinstance',
     ],
+    'mod_reflect_save_response' => [
+        'classname'   => 'mod_reflect\external\save_response',
+        'methodname'  => 'execute',
+        'description' => 'Save a student response or comment for a specific question.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities' => 'mod/reflect:submit',
+    ],
 ];
