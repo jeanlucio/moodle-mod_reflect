@@ -34,7 +34,7 @@ class mod_reflect_generator extends testing_module_generator {
      * @param array $options
      * @return stdClass
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, ?array $options = null) {
         $record = (array)$record;
 
         $defaultsettings = [
