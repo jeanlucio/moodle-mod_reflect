@@ -21,7 +21,7 @@ Feature: Reflect activity student flow
   Scenario: Add a reflect activity, questions and submit a response
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I add a "Reflect" to section "1" and I fill the form with:
+    And I add a "Reflect" to course section "1" and I fill the form with:
       | Activity name | My Reflect          |
       | Description   | Reflect description |
       | Grade method  | Distribute total grade equally |
