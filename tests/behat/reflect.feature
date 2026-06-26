@@ -16,18 +16,17 @@ Feature: Reflect activity student flow
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
+    And the following "activities" exist:
+      | activity | name       | intro               | course | idnumber | grademethod |
+      | reflect  | My Reflect | Reflect description | C1     | reflect1 | 0           |
 
   @javascript
-  Scenario: Add a reflect activity, questions and submit a response
+  Scenario: Add questions and submit a response
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Reflect" to course section "1" and I fill the form with:
-      | Activity name | My Reflect          |
-      | Description   | Reflect description |
-      | Grade method  | Distribute total grade equally |
-    And I click on "Save and display" "button"
+    And I am on "Course 1" course homepage
+    And I follow "My Reflect"
     Then I should see "No questions have been added yet."
-    
+
     # Add first question
     And I click on "Add question" "button"
     # Wait for the modal animation (we can just verify a string in it)
@@ -37,7 +36,7 @@ Feature: Reflect activity student flow
       | Response type       | Numeric (0–100 slider) |
       | Maximum grade       | 10                     |
     And I click on "Save" "button" in the "Add question" "dialogue"
-    
+
     # The question should appear inline.
     Then I should see "How confident are you?"
     And I log out
@@ -47,11 +46,11 @@ Feature: Reflect activity student flow
     And I am on "Course 1" course homepage
     And I follow "My Reflect"
     Then I should see "How confident are you?"
-    
+
     # Click Submit to finalize.
     And I click on "Submit" "button"
     Then I should see "Responses submitted successfully."
-    
+
     # Teacher views the report.
     And I log out
     And I log in as "teacher1"
