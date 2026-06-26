@@ -29,13 +29,12 @@ Feature: Reflect activity student flow
 
     # Add first question
     And I click on "Add question" "button"
-    # Wait for the modal animation (we can just verify a string in it)
-    And I should see "Reflection question" in the "Add question" "dialogue"
+    And I should see "Reflection question"
     And I set the following fields to these values:
       | Reflection question | How confident are you? |
       | Response type       | Numeric (0–100 slider) |
       | Maximum grade       | 10                     |
-    And I click on "Save" "button" in the "Add question" "dialogue"
+    And I click on "Save" "button"
 
     # The question should appear inline.
     Then I should see "How confident are you?"
