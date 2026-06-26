@@ -26,6 +26,8 @@ import Notification from 'core/notification';
 
 let cmid = 0;
 let debounceTimers = {};
+let savingText = '';
+let savedText = '';
 
 /**
  * Shows saving status indicator.
@@ -36,7 +38,7 @@ const showSaving = (card) => {
     if (status) {
         status.classList.remove('d-none');
         status.querySelector('.fa').className = 'fa fa-circle-o-notch fa-spin';
-        status.querySelector('.status-text').textContent = 'Salvando...';
+        status.querySelector('.status-text').textContent = savingText;
     }
 };
 
@@ -48,7 +50,7 @@ const showSaved = (card) => {
     const status = card.querySelector('.mod-reflect-save-status');
     if (status) {
         status.querySelector('.fa').className = 'fa fa-check text-success';
-        status.querySelector('.status-text').textContent = 'Salvo';
+        status.querySelector('.status-text').textContent = savedText;
         setTimeout(() => {
             status.classList.add('d-none');
         }, 3000);
@@ -138,6 +140,12 @@ const handleChange = (e) => {
 
 export const init = (id) => {
     cmid = id;
+
+    const container = document.getElementById('mod-reflect-student');
+    if (container) {
+        savingText = container.dataset.saving || '';
+        savedText = container.dataset.saved || '';
+    }
 
     // Attach listeners to sliders
     document.querySelectorAll('.mod-reflect-slider').forEach(slider => {

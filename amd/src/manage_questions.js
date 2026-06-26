@@ -41,8 +41,10 @@ const showForm = (question = null) => {
     const typeSelect = document.getElementById('mod-reflect-form-responsetype');
     const gradeInput = document.getElementById('mod-reflect-form-maxgrade');
 
+    const container = document.getElementById('mod-reflect-teacher');
+
     if (question) {
-        titleEl.textContent = document.querySelector('.mod-reflect-edit-btn')?.getAttribute('aria-label') || 'Edit';
+        titleEl.textContent = container.dataset.editquestion;
         idInput.value = question.id;
         textInput.value = question.questionraw || '';
         typeSelect.value = question.responsetype || 'numeric';
@@ -55,7 +57,7 @@ const showForm = (question = null) => {
         gradeInput.value = '0';
     }
 
-    form.style.display = '';
+    form.classList.remove('d-none');
     addBtn.style.display = 'none';
     textInput.focus();
 };
@@ -66,7 +68,7 @@ const showForm = (question = null) => {
 const hideForm = () => {
     const form = document.getElementById('mod-reflect-question-form');
     const addBtn = document.getElementById('mod-reflect-add-question-btn');
-    form.style.display = 'none';
+    form.classList.add('d-none');
     addBtn.style.display = '';
 };
 
@@ -204,7 +206,7 @@ export const init = (coursemoduleid) => {
         const delBtn = e.target.closest('.mod-reflect-delete-btn');
         if (delBtn) {
             const qid = parseInt(delBtn.dataset.questionid, 10);
-            const msg = container.dataset.confirmdelete || 'Are you sure?';
+            const msg = container.dataset.confirmdelete;
             deleteQuestion(qid, msg);
         }
     });
