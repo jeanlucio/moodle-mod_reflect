@@ -44,8 +44,10 @@ echo $OUTPUT->heading(get_string('responses', 'mod_reflect'));
 // Fetch all questions for table headers.
 $questions = $DB->get_records('reflect_questions', ['reflectid' => $instance->id], 'sortorder ASC');
 
-// Get all enrolled users who can submit.
-$userfields = 'u.id, u.firstname, u.lastname, u.picture, u.imagealt, u.email';
+// Get all enrolled users who can submit. Use the user fields API so fullname()
+// and user_picture() receive every name and picture field they require.
+$userfieldsapi = \core_user\fields::for_userpic();
+$userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
 $enrolledusers = get_enrolled_users($context, 'mod/reflect:submit', 0, $userfields);
 
 $templatedata = [
