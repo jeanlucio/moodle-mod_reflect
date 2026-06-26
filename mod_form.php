@@ -68,4 +68,26 @@ class mod_reflect_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }
+
+    /**
+     * Add custom completion rules.
+     *
+     * @return array Array of string IDs of added items, empty array if none
+     */
+    public function add_completion_rules(): array {
+        $mform = $this->_form;
+
+        $mform->addElement('checkbox', 'completionsubmit', get_string('completionsubmit', 'mod_reflect'));
+        return ['completionsubmit'];
+    }
+
+    /**
+     * Checks if completion rule is enabled.
+     *
+     * @param array $data Form data
+     * @return bool
+     */
+    public function completion_rule_enabled($data): bool {
+        return (!empty($data['completionsubmit']) && $data['completionsubmit'] != 0);
+    }
 }

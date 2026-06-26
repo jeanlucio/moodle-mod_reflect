@@ -107,6 +107,17 @@
                     </div>
                 </div>
             {{/allowcomment}}
+
+            <div class="mod-reflect-submit-container mt-4 mb-4 text-end">
+                <form method="post" action="view.php">
+                    <input type="hidden" name="id" value="{{cmid}}">
+                    <input type="hidden" name="action" value="submit">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <button type="submit" class="btn btn-primary mod-reflect-submit-btn">
+                        {{str_submit}}
+                    </button>
+                </form>
+            </div>
         </div>
     {{/hasquestions}}
 

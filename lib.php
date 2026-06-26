@@ -81,6 +81,10 @@ function reflect_supports(string $feature): mixed {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
         case FEATURE_GRADE_HAS_GRADE:
             return true;
         case FEATURE_BACKUP_MOODLE2:
@@ -179,4 +183,52 @@ function reflect_update_grades($instance, int $userid = 0, bool $nullifnone = tr
     }
 
     reflect_grade_item_update($instance, $grades);
+}
+
+/**
+ * Obtains the automatic completion state for this reflect based on any conditions
+ * in reflect settings.
+ *
+ * @param stdClass $course Course
+ * @param cm_info|stdClass $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not, $type if conditions not set.
+ */
+function reflect_get_completion_state(\stdClass $course, \cm_info|\stdClass $cm, int $userid, bool $type): bool {
+    global $DB;
+
+    $reflect = $DB->get_record('reflect', ['id' => $cm->instance], '*', MUST_EXIST);
+
+    // If the rule is active.
+    if (!empty($reflect->completionsubmit)) {
+        // Has the user submitted at least one response?
+        $hasresponses = $DB->record_exists('reflect_responses', ['reflectid' => $reflect->id, 'userid' => $userid]);
+        if (!$hasresponses) {
+            return false;
+        }
+        return true;
+    }
+
+    return $type;
+}
+
+/**
+ * Returns the custom completion rules for this module.
+ *
+ * @param stdClass $course Course
+ * @param cm_info|stdClass $cm Course-module
+ * @return array
+ */
+function reflect_get_completion_active_rule_descriptions(\stdClass $course, \cm_info|\stdClass $cm): array {
+    global $DB;
+
+    $reflect = $DB->get_record('reflect', ['id' => $cm->instance], '*', MUST_EXIST);
+    $rules = [];
+
+    if (!empty($reflect->completionsubmit)) {
+        $rules[] = get_string('completionsubmit', 'mod_reflect');
+    }
+
+    return $rules;
 }

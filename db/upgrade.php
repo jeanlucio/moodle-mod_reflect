@@ -113,5 +113,16 @@ function xmldb_reflect_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, 2026061800, 'reflect');
     }
 
+    if ($oldversion < 2026062600) {
+        $table = new xmldb_table('reflect');
+        $field = new xmldb_field('completionsubmit', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'grade');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026062600, 'reflect');
+    }
+
     return true;
 }

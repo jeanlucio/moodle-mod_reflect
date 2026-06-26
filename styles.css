@@ -79,6 +79,10 @@ body.path-mod-reflect .mod-reflect-global-comment {
     padding-left: 0;
 }
 
+.mod-reflect-user-col {
+    min-width: 200px;
+}
+
 body.path-mod-reflect .mod-reflect-textarea:focus,
 body.path-mod-reflect .mod-reflect-global-comment:focus {
     border-bottom: 2px solid var(--primary, #0f6cbf);

@@ -33,6 +33,33 @@ require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/reflect:view', $context);
 
+$action = optional_param('action', '', PARAM_ALPHA);
+
+if ($action === 'submit') {
+    require_sesskey();
+    require_capability('mod/reflect:submit', $context);
+
+    // Trigger event.
+    $event = \mod_reflect\event\response_submitted::create([
+        'objectid' => $instance->id,
+        'context'  => $context,
+    ]);
+    $event->trigger();
+
+    // Update completion state.
+    $completion = new completion_info($course);
+    if ($completion->is_enabled($cm) && !empty($instance->completionsubmit)) {
+        $completion->update_state($cm, COMPLETION_COMPLETE);
+    }
+
+    redirect(
+        new moodle_url('/mod/reflect/view.php', ['id' => $cm->id]),
+        get_string('submitted', 'mod_reflect'),
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
+}
+
 // Trigger course_module_viewed event.
 $event = \mod_reflect\event\course_module_viewed::create([
     'objectid' => $instance->id,
@@ -75,6 +102,8 @@ if ($canmanage) {
         'str_save'                 => get_string('savechanges'),
         'str_cancel'               => get_string('cancel'),
         'str_confirmdelete'        => get_string('confirmdelete', 'mod_reflect'),
+        'str_viewreport'           => get_string('viewreport', 'mod_reflect'),
+        'reporturl'                => (new moodle_url('/mod/reflect/report.php', ['id' => $cm->id]))->out(false),
     ];
 
     foreach ($questions as $q) {
@@ -102,6 +131,8 @@ if ($canmanage) {
         'questions'    => [],
         'str_noquestions' => get_string('noquestions', 'mod_reflect'),
         'str_comment'     => get_string('comment', 'mod_reflect') ?? 'Comentário',
+        'str_submit'      => get_string('submit', 'mod_reflect'),
+        'sesskey'         => sesskey(),
     ];
 
     // Load user's existing responses.

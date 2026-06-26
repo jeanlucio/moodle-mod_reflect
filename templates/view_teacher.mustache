@@ -114,11 +114,16 @@
     </div>
 
     {{#canmanage}}
-        <button type="button" class="btn btn-primary mt-3" id="mod-reflect-add-question-btn">
-            <i class="fa fa-plus" aria-hidden="true"></i> {{str_addquestion}}
-        </button>
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+            <button type="button" class="btn btn-primary" id="mod-reflect-add-question-btn">
+                <i class="fa fa-plus" aria-hidden="true"></i> {{str_addquestion}}
+            </button>
+            <a href="{{reporturl}}" class="btn btn-secondary">
+                <i class="fa fa-bar-chart" aria-hidden="true"></i> {{str_viewreport}}
+            </a>
+        </div>
 
-        <div id="mod-reflect-question-form" class="card mt-3" style="display: none;">
+        <div id="mod-reflect-question-form" class="card mt-3 d-none">
             <div class="card-body">
                 <h5 class="card-title" id="mod-reflect-form-title">{{str_addquestion}}</h5>
                 <input type="hidden" id="mod-reflect-form-questionid" value="0">
