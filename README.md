@@ -72,14 +72,45 @@ Reflect is designed to:
 
 Reflect ships with comprehensive PHPUnit tests ensuring stability across Moodle updates.
 
-| Test Coverage | What is covered |
-|---------------|----------------|
-| `backup_test.php` | Backup and restore step definitions, preserving questions and user responses. |
-| `external_test.php` | Web service endpoints, grading math, and session capability validations. |
-| `privacy_provider_test.php` | GDPR compliance, metadata declaration, and user data deletion. |
+#### PHPUnit — Unit & Integration Tests
+
+| Test file | Cases | What is covered |
+|-----------|------:|----------------|
+| `backup_test.php` | 1 | Backup and restore step definitions, preserving questions and user responses |
+| `cross_instance_security_test.php` | 1 | Cross-instance capability and security validations |
+| `event_test.php` | 2 | Native Moodle events triggering (course module viewed, response submitted) |
+| `external_test.php` | 3 | Web service endpoints, grading math, and session capability validations |
+| `lib_test.php` | 6 | Instance lifecycle (add, update, delete), gradebook integration and completion rules |
+| `privacy_provider_test.php` | 6 | GDPR compliance, metadata declaration, and user data deletion |
+| **Total** | **19** | |
+
+**Line coverage by class (PHPUnit + Xdebug):**
+
+| Class | Line coverage |
+|-------|:-------------:|
+| `event\course_module_viewed` | 100% |
+| `privacy\provider` | 87% |
+| `event\response_submitted` | 72% |
+| `external\delete_question` | 72% |
+| `external\save_response` | 68% |
+| `external\save_question` | 58% |
+| `local\grade_manager` | 57% |
+| **Overall** | **72.83%** |
 
 ```bash
 vendor/bin/phpunit --testsuite mod_reflect
+```
+
+#### Behat — Acceptance Tests
+
+| Feature file | Scenarios | What is covered |
+|--------------|----------:|----------------|
+| `reflect.feature` | 1 | Teacher creates an inline question, student views and submits response, teacher views the responses report |
+| **Total** | **1** | |
+
+```bash
+php admin/tool/behat/cli/init.php
+vendor/bin/behat --tags=@mod_reflect --profile=chrome
 ```
 
 ---
@@ -155,14 +186,45 @@ O Reflect foi projetado para:
 
 O Reflect inclui testes abrangentes em PHPUnit para garantir a estabilidade a cada atualização do Moodle.
 
-| Cobertura de Testes | O que é coberto |
-|---------------------|----------------|
-| `backup_test.php` | Definições de backup e restore, preservando as perguntas e respostas dos usuários. |
-| `external_test.php` | Endpoints de web service, cálculos de nota e validações de capability. |
-| `privacy_provider_test.php` | Conformidade com LGPD, declaração de metadados e exclusão de dados de usuário. |
+#### PHPUnit — Testes Unitários e de Integração
+
+| Arquivo de teste | Casos | O que é coberto |
+|-----------------|------:|----------------|
+| `backup_test.php` | 1 | Definições de backup e restore, preservando as perguntas e respostas dos usuários |
+| `cross_instance_security_test.php` | 1 | Validações de segurança e capacidades entre instâncias |
+| `event_test.php` | 2 | Disparo de eventos nativos do Moodle (visualização do módulo, submissão de respostas) |
+| `external_test.php` | 3 | Endpoints de web service, cálculos de nota e validações de capability |
+| `lib_test.php` | 6 | Ciclo de vida da instância (adicionar, atualizar, excluir), integração com gradebook e regras de conclusão |
+| `privacy_provider_test.php` | 6 | Conformidade com LGPD, declaração de metadados e exclusão de dados de usuário |
+| **Total** | **19** | |
+
+**Cobertura de linhas por classe (PHPUnit + Xdebug):**
+
+| Classe | Cobertura de linhas |
+|--------|:-------------------:|
+| `event\course_module_viewed` | 100% |
+| `privacy\provider` | 87% |
+| `event\response_submitted` | 72% |
+| `external\delete_question` | 72% |
+| `external\save_response` | 68% |
+| `external\save_question` | 58% |
+| `local\grade_manager` | 57% |
+| **Total** | **72.83%** |
 
 ```bash
 vendor/bin/phpunit --testsuite mod_reflect
+```
+
+#### Behat — Testes de Aceitação
+
+| Arquivo de feature | Cenários | O que é coberto |
+|-------------------|--------:|----------------|
+| `reflect.feature` | 1 | Professor cria pergunta na própria tela (inline), aluno visualiza e envia a resposta, professor visualiza relatório de respostas |
+| **Total** | **1** | |
+
+```bash
+php admin/tool/behat/cli/init.php
+vendor/bin/behat --tags=@mod_reflect --profile=chrome
 ```
 
 ---
