@@ -33,9 +33,9 @@ class grade_manager {
     /**
      * Create or update the grade item for given reflect instance.
      *
-     * @param stdClass $instance
-     * @param mixed $grades
-     * @return int 0 if ok, error code otherwise
+     * @param stdClass $instance The reflect instance object.
+     * @param mixed $grades Optional grades to be updated.
+     * @return int 0 if ok, error code otherwise.
      */
     public static function update_grade_item(stdClass $instance, mixed $grades = null): int {
         global $CFG;
@@ -60,7 +60,7 @@ class grade_manager {
     /**
      * Update grades in the gradebook.
      *
-     * @param stdClass $instance
+     * @param stdClass $instance The reflect instance object.
      * @param int $userid Update grade of specific user only.
      * @param bool $nullifnone If true and no responses found, set grade to null.
      * @return void

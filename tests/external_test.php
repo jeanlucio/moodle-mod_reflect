@@ -99,10 +99,10 @@ final class external_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
-        
+
         $result = \mod_reflect\external\save_question::execute(
             $reflect->cmid,
-            0, // new question
+            0, // New question.
             'How are you?',
             FORMAT_HTML,
             'numeric',
@@ -110,7 +110,7 @@ final class external_test extends advanced_testcase {
         );
         $result = external_api::clean_returnvalue(\mod_reflect\external\save_question::execute_returns(), $result);
         $this->assertTrue($result['success']);
-        
+
         $question = $DB->get_record('reflect_questions', ['reflectid' => $reflect->id]);
         $this->assertEquals('How are you?', $question->question);
         $this->assertEquals(5, $question->maxgrade);
@@ -129,14 +129,14 @@ final class external_test extends advanced_testcase {
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
         $q1 = $generator->create_question($reflect->id, ['responsetype' => 'numeric']);
-        
+
         $result = \mod_reflect\external\delete_question::execute(
             $reflect->cmid,
             $q1->id
         );
         $result = external_api::clean_returnvalue(\mod_reflect\external\delete_question::execute_returns(), $result);
         $this->assertTrue($result['success']);
-        
+
         $this->assertFalse($DB->record_exists('reflect_questions', ['id' => $q1->id]));
     }
 }

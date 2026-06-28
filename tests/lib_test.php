@@ -42,7 +42,6 @@ use stdClass;
  * @covers \reflect_get_completion_active_rule_descriptions
  */
 final class lib_test extends advanced_testcase {
-
     /**
      * Setup before each test.
      */
@@ -59,7 +58,7 @@ final class lib_test extends advanced_testcase {
     public function test_reflect_add_instance(): void {
         global $DB;
         $course = $this->getDataGenerator()->create_course();
-        
+
         $data = new stdClass();
         $data->course = $course->id;
         $data->name = 'Reflect Test';
@@ -67,15 +66,20 @@ final class lib_test extends advanced_testcase {
         $data->introformat = FORMAT_HTML;
         $data->grade = 100;
         $data->grademethod = 'distribute';
-        
+
         $id = reflect_add_instance($data);
-        
+
         $this->assertNotEmpty($id);
         $record = $DB->get_record('reflect', ['id' => $id]);
         $this->assertEquals('Reflect Test', $record->name);
-        
+
         // Verify grade item was created.
-        $gradeitem = \grade_item::fetch(['courseid' => $course->id, 'itemtype' => 'mod', 'itemmodule' => 'reflect', 'iteminstance' => $id]);
+        $gradeitem = \grade_item::fetch([
+            'courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'reflect',
+            'iteminstance' => $id,
+        ]);
         $this->assertNotEmpty($gradeitem);
         $this->assertEquals(100, $gradeitem->grademax);
     }
@@ -88,23 +92,28 @@ final class lib_test extends advanced_testcase {
         global $DB;
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id, 'grade' => 10]);
-        
+
         $data = new stdClass();
         $data->instance = $reflect->id;
         $data->course = $course->id;
         $data->name = 'Updated Reflect';
         $data->grade = 50;
         $data->grademethod = 'manual';
-        
+
         $result = reflect_update_instance($data);
         $this->assertTrue($result);
-        
+
         $record = $DB->get_record('reflect', ['id' => $reflect->id]);
         $this->assertEquals('Updated Reflect', $record->name);
         $this->assertEquals(50, $record->grade);
-        
+
         // Verify grade item was updated.
-        $gradeitem = \grade_item::fetch(['courseid' => $course->id, 'itemtype' => 'mod', 'itemmodule' => 'reflect', 'iteminstance' => $reflect->id]);
+        $gradeitem = \grade_item::fetch([
+            'courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'reflect',
+            'iteminstance' => $reflect->id,
+        ]);
         $this->assertEquals(50, $gradeitem->grademax);
     }
 
@@ -117,12 +126,12 @@ final class lib_test extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
-        
+
         $generator->create_question($reflect->id, ['responsetype' => 'numeric']);
-        
+
         $result = reflect_delete_instance($reflect->id);
         $this->assertTrue($result);
-        
+
         $this->assertFalse($DB->record_exists('reflect', ['id' => $reflect->id]));
         $this->assertFalse($DB->record_exists('reflect_questions', ['reflectid' => $reflect->id]));
     }
@@ -146,35 +155,40 @@ final class lib_test extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
-        
+
         $reflect = $this->getDataGenerator()->create_module('reflect', [
             'course' => $course->id,
             'grade' => 10,
-            'grademethod' => 'manual'
+            'grademethod' => 'manual',
         ]);
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
         $q1 = $generator->create_question($reflect->id, ['responsetype' => 'numeric', 'maxgrade' => 5]);
         $q2 = $generator->create_question($reflect->id, ['responsetype' => 'numeric', 'maxgrade' => 5]);
-        
+
         // Add responses for student 1.
         $DB->insert_record('reflect_responses', [
             'reflectid' => $reflect->id, 'questionid' => $q1->id, 'userid' => $student1->id,
-            'value' => 100, 'timecreated' => time(), 'timemodified' => time()
+            'value' => 100, 'timecreated' => time(), 'timemodified' => time(),
         ]);
         $DB->insert_record('reflect_responses', [
             'reflectid' => $reflect->id, 'questionid' => $q2->id, 'userid' => $student1->id,
-            'value' => 50, 'timecreated' => time(), 'timemodified' => time()
+            'value' => 50, 'timecreated' => time(), 'timemodified' => time(),
         ]);
-        
+
         reflect_update_grades($reflect);
-        
+
         // Check gradebook.
-        $gradeitem = \grade_item::fetch(['courseid' => $course->id, 'itemtype' => 'mod', 'itemmodule' => 'reflect', 'iteminstance' => $reflect->id]);
+        $gradeitem = \grade_item::fetch([
+            'courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'reflect',
+            'iteminstance' => $reflect->id,
+        ]);
         $grade1 = \grade_grade::fetch(['itemid' => $gradeitem->id, 'userid' => $student1->id]);
-        
-        // Q1 max 5 (100%), Q2 max 5 (50%) -> 5 + 2.5 = 7.5
+
+        // Q1 max 5 (100%), Q2 max 5 (50%) -> 5 + 2.5 = 7.5.
         $this->assertEquals(7.5, $grade1->rawgrade);
-        
+
         // Student 2 has no responses, so no grade entry (or null).
         $grade2 = \grade_grade::fetch(['itemid' => $gradeitem->id, 'userid' => $student2->id]);
         $this->assertFalse($grade2);
@@ -189,30 +203,30 @@ final class lib_test extends advanced_testcase {
         global $DB;
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
-        
+
         $reflect = $this->getDataGenerator()->create_module('reflect', [
             'course' => $course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
-            'completionsubmit' => 1
+            'completionsubmit' => 1,
         ]);
-        
+
         $cm = get_coursemodule_from_instance('reflect', $reflect->id);
-        
+
         $rules = reflect_get_completion_active_rule_descriptions($course, $cm);
         $this->assertCount(1, $rules);
-        
+
         // Initially false.
         $state = reflect_get_completion_state($course, $cm, $student->id, false);
         $this->assertFalse($state);
-        
+
         // Add response.
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
         $q1 = $generator->create_question($reflect->id, ['responsetype' => 'text']);
         $DB->insert_record('reflect_responses', [
             'reflectid' => $reflect->id, 'questionid' => $q1->id, 'userid' => $student->id,
-            'value' => null, 'timecreated' => time(), 'timemodified' => time()
+            'value' => null, 'timecreated' => time(), 'timemodified' => time(),
         ]);
-        
+
         // Now true.
         $state = reflect_get_completion_state($course, $cm, $student->id, false);
         $this->assertTrue($state);

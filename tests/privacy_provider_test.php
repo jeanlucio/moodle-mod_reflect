@@ -47,7 +47,7 @@ final class privacy_provider_test extends provider_testcase {
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $user = $this->getDataGenerator()->create_user();
-        
+
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
         $q = $generator->create_question($reflect->id);
 
@@ -61,8 +61,8 @@ final class privacy_provider_test extends provider_testcase {
 
         $contextlist = provider::get_contexts_for_userid($user->id);
         $this->assertCount(1, $contextlist);
-        
-        // Also test get_metadata
+
+        // Also test get_metadata.
         $collection = new \core_privacy\local\metadata\collection('mod_reflect');
         $collection = provider::get_metadata($collection);
         $this->assertNotEmpty($collection->get_collection());
@@ -76,7 +76,7 @@ final class privacy_provider_test extends provider_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
-        
+
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $cm = get_coursemodule_from_instance('reflect', $reflect->id);
@@ -107,7 +107,7 @@ final class privacy_provider_test extends provider_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
-        
+
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $cm = get_coursemodule_from_instance('reflect', $reflect->id);
@@ -128,7 +128,7 @@ final class privacy_provider_test extends provider_testcase {
         $this->assertFalse($writer->has_any_data());
 
         provider::export_user_data($approvedcontextlist);
-        
+
         $data = $writer->get_data([get_string('pluginname', 'mod_reflect'), get_string('responses', 'mod_reflect')]);
         $this->assertNotEmpty($data);
         $this->assertCount(1, $data->responses);
@@ -143,7 +143,7 @@ final class privacy_provider_test extends provider_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
-        
+
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $cm = get_coursemodule_from_instance('reflect', $reflect->id);
@@ -169,7 +169,7 @@ final class privacy_provider_test extends provider_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
-        
+
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $cm = get_coursemodule_from_instance('reflect', $reflect->id);
@@ -196,7 +196,7 @@ final class privacy_provider_test extends provider_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
-        
+
         $course = $this->getDataGenerator()->create_course();
         $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
         $user = $this->getDataGenerator()->create_user();

@@ -34,7 +34,6 @@ use advanced_testcase;
  * @covers \mod_reflect\event\response_submitted
  */
 final class event_test extends advanced_testcase {
-
     /**
      * Setup before each test.
      */
@@ -86,7 +85,7 @@ final class event_test extends advanced_testcase {
             'objectid' => $reflect->id,
             'context' => $context,
             'courseid' => $course->id,
-            'other' => ['questionid' => 123]
+            'other' => ['questionid' => 123],
         ]);
         $event->trigger();
 
