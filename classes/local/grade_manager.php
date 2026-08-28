@@ -24,6 +24,7 @@
 
 namespace mod_reflect\local;
 
+use grade_item;
 use stdClass;
 
 /**
@@ -54,7 +55,28 @@ class grade_manager {
             $params['gradetype'] = GRADE_TYPE_NONE;
         }
 
-        return grade_update('mod/reflect', $instance->course, 'mod', 'reflect', $instance->id, 0, $grades, $params);
+        $result = grade_update('mod/reflect', $instance->course, 'mod', 'reflect', $instance->id, 0, $grades, $params);
+
+        // The core grade_update() function silently ignores a 'gradepass' key in
+        // $itemdetails: its own internal allow-list (lib/gradelib.php) only lets
+        // itemname/idnumber/gradetype/grademax/grademin/scaleid/multfactor/plusfactor/
+        // deleted/hidden through. The pass grade has to be applied directly on the
+        // grade_item instead, mirroring how mod_workshop does it.
+        if ($result === GRADE_UPDATE_OK && !empty($instance->gradepass)) {
+            $gradeitem = grade_item::fetch([
+                'itemtype' => 'mod',
+                'itemmodule' => 'reflect',
+                'iteminstance' => $instance->id,
+                'itemnumber' => 0,
+                'courseid' => $instance->course,
+            ]);
+            if ($gradeitem && (float)$gradeitem->gradepass !== (float)$instance->gradepass) {
+                $gradeitem->gradepass = (float)$instance->gradepass;
+                $gradeitem->update();
+            }
+        }
+
+        return $result;
     }
 
     /**
