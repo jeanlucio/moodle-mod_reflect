@@ -80,7 +80,6 @@ $canmanage = has_capability('mod/reflect:addinstance', $context);
 $questions = $DB->get_records('reflect_questions', ['reflectid' => $instance->id], 'sortorder ASC');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($instance->name);
 
 if ($canmanage) {
     // Teacher view: manage questions inline.
