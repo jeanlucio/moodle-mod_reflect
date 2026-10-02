@@ -231,4 +231,99 @@ final class lib_test extends advanced_testcase {
         $state = reflect_get_completion_state($course, $cm, $student->id, false);
         $this->assertTrue($state);
     }
+
+    /**
+     * Creates an activity with two numeric questions answered by one student, the second
+     * answer saved an hour after the first.
+     *
+     * @param string $grademethod The activity's grading method.
+     * @return array [$course, $reflect, $student, $lastsaved]
+     */
+    private function answered_activity(string $grademethod): array {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $reflect = $this->getDataGenerator()->create_module('reflect', [
+            'course' => $course->id,
+            'grade' => 10,
+            'grademethod' => $grademethod,
+        ]);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
+        $q1 = $generator->create_question($reflect->id, ['responsetype' => 'numeric', 'maxgrade' => 2]);
+        $q2 = $generator->create_question($reflect->id, ['responsetype' => 'numeric', 'maxgrade' => 8]);
+
+        $base = 1700000000;
+        $lastsaved = $base + HOURSECS;
+        $DB->insert_record('reflect_responses', [
+            'reflectid' => $reflect->id, 'questionid' => $q1->id, 'userid' => $student->id,
+            'value' => 100, 'timecreated' => $base, 'timemodified' => $base,
+        ]);
+        $DB->insert_record('reflect_responses', [
+            'reflectid' => $reflect->id, 'questionid' => $q2->id, 'userid' => $student->id,
+            'value' => 50, 'timecreated' => $lastsaved, 'timemodified' => $lastsaved,
+        ]);
+
+        return [$course, $reflect, $student, $lastsaved];
+    }
+
+    /**
+     * Returns the student's grade_grade in the activity.
+     *
+     * @param stdClass $course The course.
+     * @param stdClass $reflect The activity.
+     * @param stdClass $student The student.
+     * @return \grade_grade
+     */
+    private function fetch_grade(stdClass $course, stdClass $reflect, stdClass $student): \grade_grade {
+        $gradeitem = \grade_item::fetch([
+            'courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'reflect',
+            'iteminstance' => $reflect->id,
+        ]);
+
+        return \grade_grade::fetch(['itemid' => $gradeitem->id, 'userid' => $student->id]);
+    }
+
+    /**
+     * The grade carries when the student last saved their responses, as mod_assign reports
+     * a submission's last modification: gradebook consumers (e.g. late-penalty plugins)
+     * read it as the submission time.
+     *
+     * @return void
+     */
+    public function test_reflect_update_grades_reports_latest_response_time(): void {
+        [$course, $reflect, $student, $lastsaved] = $this->answered_activity('manual');
+
+        reflect_update_grades($reflect, (int) $student->id);
+
+        $this->assertEquals($lastsaved, $this->fetch_grade($course, $reflect, $student)->get_datesubmitted());
+    }
+
+    /**
+     * Saving new settings recomputes every grade (reflect_update_instance() already did), and
+     * the recomputed grade keeps the time the student last saved, rather than looking like a
+     * new submission made when the teacher saved the settings.
+     *
+     * @return void
+     */
+    public function test_reflect_settings_recompute_keeps_latest_response_time(): void {
+        [$course, $reflect, $student, $lastsaved] = $this->answered_activity('manual');
+        reflect_update_grades($reflect, (int) $student->id);
+
+        $data = (object) [
+            'instance' => $reflect->id,
+            'course' => $course->id,
+            'name' => $reflect->name,
+            'grade' => 10,
+            'grademethod' => 'distribute',
+        ];
+        reflect_update_instance($data);
+
+        $grade = $this->fetch_grade($course, $reflect, $student);
+        // Manual was 100% of 2 + 50% of 8 = 6; distributed is 10 / 2 = 5 each, so 5 + 2.5.
+        $this->assertEquals(7.5, $grade->rawgrade);
+        $this->assertEquals($lastsaved, $grade->get_datesubmitted());
+    }
 }

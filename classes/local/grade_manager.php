@@ -146,9 +146,14 @@ class grade_manager {
                 $totalscore = null;
             }
 
+            // The responses are the student's submission, so it was last submitted when they
+            // last saved any of them, as mod_assign reports a submission's last modification.
+            $lastsaved = $responses ? max(array_map(fn($resp) => (int)$resp->timemodified, $responses)) : null;
+
             $grades[$uid] = (object) [
                 'userid' => $uid,
                 'rawgrade' => $totalscore,
+                'datesubmitted' => $lastsaved,
             ];
         }
 
