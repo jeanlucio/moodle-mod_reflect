@@ -23,7 +23,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_reflect\tests;
+namespace mod_reflect;
 
 use advanced_testcase;
 use stdClass;
@@ -31,15 +31,15 @@ use stdClass;
 /**
  * Library functions tests for mod_reflect.
  *
- * @coversDefaultClass \mod_reflect\local\grade_manager
- * @covers \reflect_add_instance
- * @covers \reflect_update_instance
- * @covers \reflect_delete_instance
- * @covers \reflect_supports
- * @covers \reflect_grade_item_update
- * @covers \reflect_update_grades
- * @covers \reflect_get_completion_state
- * @covers \reflect_get_completion_active_rule_descriptions
+ * @covers \mod_reflect\local\grade_manager
+ * @covers ::reflect_add_instance
+ * @covers ::reflect_update_instance
+ * @covers ::reflect_delete_instance
+ * @covers ::reflect_supports
+ * @covers ::reflect_grade_item_update
+ * @covers ::reflect_update_grades
+ * @covers ::reflect_get_completion_state
+ * @covers ::reflect_get_completion_active_rule_descriptions
  */
 final class lib_test extends advanced_testcase {
     /**
@@ -53,7 +53,6 @@ final class lib_test extends advanced_testcase {
 
     /**
      * Test adding a reflect instance.
-     * @covers \reflect_add_instance
      */
     public function test_reflect_add_instance(): void {
         global $DB;
@@ -86,7 +85,6 @@ final class lib_test extends advanced_testcase {
 
     /**
      * Test updating a reflect instance.
-     * @covers \reflect_update_instance
      */
     public function test_reflect_update_instance(): void {
         global $DB;
@@ -119,7 +117,6 @@ final class lib_test extends advanced_testcase {
 
     /**
      * Test deleting a reflect instance.
-     * @covers \reflect_delete_instance
      */
     public function test_reflect_delete_instance(): void {
         global $DB;
@@ -138,7 +135,6 @@ final class lib_test extends advanced_testcase {
 
     /**
      * Test reflect_supports function.
-     * @covers \reflect_supports
      */
     public function test_reflect_supports(): void {
         $this->assertTrue(reflect_supports(FEATURE_MOD_INTRO));
@@ -148,7 +144,6 @@ final class lib_test extends advanced_testcase {
 
     /**
      * Test updating grades.
-     * @covers ::update_grades
      */
     public function test_reflect_update_grades(): void {
         global $DB;
@@ -196,8 +191,6 @@ final class lib_test extends advanced_testcase {
 
     /**
      * Test completion rules.
-     * @covers \reflect_get_completion_state
-     * @covers \reflect_get_completion_active_rule_descriptions
      */
     public function test_completion(): void {
         global $DB;

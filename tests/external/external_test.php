@@ -23,18 +23,21 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_reflect\tests;
+namespace mod_reflect\external;
 
 use advanced_testcase;
 use core_external\external_api;
 
 /**
  * External functions tests for mod_reflect.
+ *
+ * @covers \mod_reflect\external\delete_question
+ * @covers \mod_reflect\external\save_question
+ * @covers \mod_reflect\external\save_response
  */
 final class external_test extends advanced_testcase {
     /**
      * Test saving a response and gradebook update.
-     * @covers \mod_reflect\external\save_response::execute
      */
     public function test_save_response(): void {
         global $DB;
@@ -90,7 +93,6 @@ final class external_test extends advanced_testcase {
 
     /**
      * Test saving a question.
-     * @covers \mod_reflect\external\save_question::execute
      */
     public function test_save_question(): void {
         global $DB;
@@ -118,7 +120,6 @@ final class external_test extends advanced_testcase {
 
     /**
      * Test deleting a question.
-     * @covers \mod_reflect\external\delete_question::execute
      */
     public function test_delete_question(): void {
         global $DB;

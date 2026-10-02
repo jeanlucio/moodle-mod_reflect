@@ -23,21 +23,20 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_reflect\tests;
+namespace mod_reflect\privacy;
 
-use core_privacy\tests\provider_testcase;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
-use mod_reflect\privacy\provider;
+use core_privacy\tests\provider_testcase;
 
 /**
  * Privacy tests for mod_reflect.
+ *
+ * @covers \mod_reflect\privacy\provider
  */
-final class privacy_provider_test extends provider_testcase {
+final class provider_test extends provider_testcase {
     /**
      * Test getting contexts for a user.
-     * @covers \mod_reflect\privacy\provider::get_contexts_for_userid
-     * @covers \mod_reflect\privacy\provider::get_metadata
      */
     public function test_get_contexts_for_userid(): void {
         global $DB;
@@ -70,7 +69,6 @@ final class privacy_provider_test extends provider_testcase {
 
     /**
      * Test getting users in context.
-     * @covers \mod_reflect\privacy\provider::get_users_in_context
      */
     public function test_get_users_in_context(): void {
         global $DB;
@@ -101,7 +99,6 @@ final class privacy_provider_test extends provider_testcase {
 
     /**
      * Test exporting user data.
-     * @covers \mod_reflect\privacy\provider::export_user_data
      */
     public function test_export_user_data(): void {
         global $DB;
@@ -137,7 +134,6 @@ final class privacy_provider_test extends provider_testcase {
 
     /**
      * Test deleting data for all users in a context.
-     * @covers \mod_reflect\privacy\provider::delete_data_for_all_users_in_context
      */
     public function test_delete_data_for_all_users_in_context(): void {
         global $DB;
@@ -163,7 +159,6 @@ final class privacy_provider_test extends provider_testcase {
 
     /**
      * Test deleting data for users in a context.
-     * @covers \mod_reflect\privacy\provider::delete_data_for_users
      */
     public function test_delete_data_for_users(): void {
         global $DB;
@@ -190,7 +185,6 @@ final class privacy_provider_test extends provider_testcase {
 
     /**
      * Test deleting data for a user.
-     * @covers \mod_reflect\privacy\provider::delete_data_for_user
      */
     public function test_delete_data_for_user(): void {
         global $DB;

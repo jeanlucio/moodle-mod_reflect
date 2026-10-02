@@ -26,7 +26,7 @@ use core_external\external_api;
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @coversDefaultClass \mod_reflect\external\save_response
+ * @covers \mod_reflect\external\save_response
  */
 final class cross_instance_security_test extends advanced_testcase {
     /**
@@ -40,8 +40,6 @@ final class cross_instance_security_test extends advanced_testcase {
 
     /**
      * Test that a student cannot save a response to a question belonging to another instance.
-     *
-     * @covers ::execute
      */
     public function test_save_response_cross_instance(): void {
         global $DB;

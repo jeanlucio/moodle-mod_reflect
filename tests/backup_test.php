@@ -23,7 +23,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_reflect\tests;
+namespace mod_reflect;
 
 use advanced_testcase;
 
@@ -31,11 +31,15 @@ use advanced_testcase;
 
 /**
  * Backup and restore tests for mod_reflect.
+ *
+ * @covers \backup_reflect_activity_task
+ * @covers \backup_reflect_activity_structure_step
+ * @covers \restore_reflect_activity_task
+ * @covers \restore_reflect_activity_structure_step
  */
 final class backup_test extends advanced_testcase {
     /**
      * Test backup and restore of reflect activity.
-     * @covers \backup_reflect_activity_task
      */
     public function test_backup_and_restore(): void {
         global $DB, $USER, $CFG;
