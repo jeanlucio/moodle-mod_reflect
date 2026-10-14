@@ -36,12 +36,13 @@ class backup_reflect_activity_structure_step extends backup_activity_structure_s
         // Define each element separated.
         $reflect = new backup_nested_element('reflect', ['id'], [
             'name', 'intro', 'introformat', 'grademethod', 'allowcomment',
-            'grade', 'timecreated', 'timemodified',
+            'grade', 'completionsubmit', 'timecreated', 'timemodified',
         ]);
 
         $questions = new backup_nested_element('questions');
         $question = new backup_nested_element('question', ['id'], [
             'question', 'questionformat', 'responsetype', 'maxgrade', 'sortorder',
+            'timecreated', 'timemodified',
         ]);
 
         $responses = new backup_nested_element('responses');

@@ -70,6 +70,8 @@ class mod_reflect_generator extends testing_module_generator {
         $question->responsetype = $record['responsetype'] ?? 'numeric';
         $question->maxgrade = $record['maxgrade'] ?? 10.0;
         $question->sortorder = $record['sortorder'] ?? 1;
+        $question->timecreated = $record['timecreated'] ?? time();
+        $question->timemodified = $record['timemodified'] ?? $question->timecreated;
 
         $question->id = $DB->insert_record('reflect_questions', $question);
         return $question;

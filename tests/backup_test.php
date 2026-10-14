@@ -87,6 +87,37 @@ final class backup_test extends advanced_testcase {
     }
 
     /**
+     * The completion rule and the timestamps of the questions survive a restore. Neither column was
+     * in the backup, so a restored activity lost its "submit to complete" rule and its questions
+     * came back dated 1970.
+     */
+    public function test_backup_and_restore_keeps_the_completion_rule_and_question_dates(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
+        $reflect = $this->getDataGenerator()->create_module('reflect', [
+            'course' => $course->id,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionsubmit' => 1,
+        ]);
+        $this->getDataGenerator()->get_plugin_generator('mod_reflect')->create_question($reflect->id, [
+            'timecreated' => 1700000000,
+            'timemodified' => 1700000500,
+        ]);
+
+        $newcourseid = $this->backup_and_restore($course);
+
+        $newreflect = $DB->get_record('reflect', ['course' => $newcourseid], '*', MUST_EXIST);
+        $this->assertSame(1, (int) $newreflect->completionsubmit);
+        $question = $DB->get_record('reflect_questions', ['reflectid' => $newreflect->id], '*', MUST_EXIST);
+        $this->assertSame(1700000000, (int) $question->timecreated);
+        $this->assertSame(1700000500, (int) $question->timemodified);
+    }
+
+    /**
      * Backs a course up and restores it.
      *
      * @param \stdClass $srccourse Course object to backup

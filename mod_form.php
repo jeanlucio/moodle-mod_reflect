@@ -43,6 +43,7 @@ class mod_reflect_mod_form extends moodleform_mod {
         $mform->addElement('text', 'name', get_string('activityname', 'mod_reflect'), ['size' => '64']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
         $this->standard_intro_elements();
 
