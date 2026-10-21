@@ -55,6 +55,12 @@ class grade_manager {
             $params['gradetype'] = GRADE_TYPE_NONE;
         }
 
+        // Clear the recorded grades of the item on a 'reset' request, as the other activities do.
+        if ($grades === 'reset') {
+            $params['reset'] = true;
+            $grades = null;
+        }
+
         $result = grade_update('mod/reflect', $instance->course, 'mod', 'reflect', $instance->id, 0, $grades, $params);
 
         // The core grade_update() function silently ignores a 'gradepass' key in

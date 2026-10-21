@@ -68,6 +68,7 @@ $string['reflect:submit'] = 'Enviar uma resposta';
 $string['reflect:view'] = 'Visualizar uma atividade Reflect';
 $string['reflect:viewreports'] = 'Visualizar todas as respostas dos estudantes';
 $string['reflectsettings'] = 'Configurações do Reflect';
+$string['resetreflectuserdata'] = 'Excluir todas as respostas dos estudantes';
 $string['responses'] = 'Respostas';
 $string['responsetype'] = 'Tipo de resposta';
 $string['responsetype_numeric'] = 'Numérico (controle deslizante 0–100)';

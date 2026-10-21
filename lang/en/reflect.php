@@ -66,6 +66,7 @@ $string['reflect:submit'] = 'Submit a response';
 $string['reflect:view'] = 'View a Reflect activity';
 $string['reflect:viewreports'] = 'View all student responses';
 $string['reflectsettings'] = 'Reflect settings';
+$string['resetreflectuserdata'] = 'Delete all the students\' responses';
 $string['responses'] = 'Responses';
 $string['responsetype'] = 'Response type';
 $string['responsetype_numeric'] = 'Numeric (0–100 slider)';

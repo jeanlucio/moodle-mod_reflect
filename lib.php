@@ -169,3 +169,63 @@ function reflect_get_completion_active_rule_descriptions(stdClass|cm_info $cm): 
 
     return $descriptions;
 }
+
+/**
+ * Adds the reflect section to the course reset form.
+ *
+ * @param MoodleQuickForm $mform The course reset form.
+ * @return void
+ */
+function reflect_reset_course_form_definition(MoodleQuickForm $mform): void {
+    $mform->addElement('header', 'reflectheader', get_string('modulenameplural', 'mod_reflect'));
+    $mform->addElement('advcheckbox', 'reset_reflect_userdata', get_string('resetreflectuserdata', 'mod_reflect'));
+}
+
+/**
+ * Returns the default values for the reflect course reset form.
+ *
+ * @param stdClass $course The course being reset.
+ * @return array
+ */
+function reflect_reset_course_form_defaults(stdClass $course): array {
+    return ['reset_reflect_userdata' => 1];
+}
+
+/**
+ * Removes the students' responses from the course's activities when it is reset.
+ *
+ * Core clears the completion and the grades by itself but only asks the activities that define this
+ * function to clear their own data. Left behind, the rows would satisfy the completion rule again and
+ * bring the old grade back for a student enrolled again. What the teacher wrote stays.
+ *
+ * @param stdClass $data Reset form data, must contain courseid.
+ * @return array Status rows for the course reset report.
+ */
+function reflect_reset_userdata(stdClass $data): array {
+    global $DB;
+
+    $status = [];
+    if (empty($data->reset_reflect_userdata)) {
+        return $status;
+    }
+
+    $instances = $DB->get_records('reflect', ['course' => $data->courseid]);
+    if (empty($instances)) {
+        return $status;
+    }
+
+    [$insql, $inparams] = $DB->get_in_or_equal(array_keys($instances), SQL_PARAMS_NAMED, 'rfid');
+    $DB->delete_records_select('reflect_responses', "reflectid $insql", $inparams);
+
+    foreach ($instances as $instance) {
+        reflect_grade_item_update($instance, 'reset');
+    }
+
+    $status[] = [
+        'component' => get_string('modulenameplural', 'mod_reflect'),
+        'item'      => get_string('resetreflectuserdata', 'mod_reflect'),
+        'error'     => false,
+    ];
+
+    return $status;
+}
