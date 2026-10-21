@@ -38,7 +38,7 @@ use stdClass;
  * @covers ::reflect_supports
  * @covers ::reflect_grade_item_update
  * @covers ::reflect_update_grades
- * @covers ::reflect_get_completion_state
+ * @covers ::reflect_get_coursemodule_info
  * @covers ::reflect_get_completion_active_rule_descriptions
  */
 final class lib_test extends advanced_testcase {
@@ -190,39 +190,63 @@ final class lib_test extends advanced_testcase {
     }
 
     /**
-     * Test completion rules.
+     * The rule is published for the course page only with automatic tracking, and only when it is on.
      */
-    public function test_completion(): void {
-        global $DB;
+    public function test_get_coursemodule_info_publishes_the_rule_only_with_automatic_tracking(): void {
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
-        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $auto = $this->getDataGenerator()->create_module('reflect', [
+            'course' => $course->id,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionsubmit' => 1,
+        ]);
+        $manual = $this->getDataGenerator()->create_module('reflect', [
+            'course' => $course->id,
+            'completion' => COMPLETION_TRACKING_MANUAL,
+            'completionsubmit' => 1,
+        ]);
 
+        $autoinfo = reflect_get_coursemodule_info(get_coursemodule_from_instance('reflect', $auto->id));
+        $manualinfo = reflect_get_coursemodule_info(get_coursemodule_from_instance('reflect', $manual->id));
+
+        $this->assertSame(1, $autoinfo->customdata['customcompletionrules']['completionsubmit']);
+        $this->assertEmpty($manualinfo->customdata ?? []);
+    }
+
+    /**
+     * The intro only reaches the course page when "Display description on course page" is ticked.
+     */
+    public function test_get_coursemodule_info_returns_the_intro_only_when_asked(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $reflect = $this->getDataGenerator()->create_module('reflect', [
+            'course' => $course->id,
+            'intro' => 'Course page intro',
+            'showdescription' => 1,
+        ]);
+        $cm = get_coursemodule_from_instance('reflect', $reflect->id);
+
+        $this->assertStringContainsString('Course page intro', reflect_get_coursemodule_info($cm)->content);
+
+        $cm->showdescription = 0;
+        $this->assertEmpty(reflect_get_coursemodule_info($cm)->content);
+    }
+
+    /**
+     * The core's completion pages call the description callback with the course module alone.
+     */
+    public function test_the_active_rule_descriptions_follow_the_published_rule(): void {
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
         $reflect = $this->getDataGenerator()->create_module('reflect', [
             'course' => $course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionsubmit' => 1,
         ]);
+        $cminfo = get_fast_modinfo($course)->get_cm($reflect->cmid);
 
-        $cm = get_coursemodule_from_instance('reflect', $reflect->id);
-
-        $rules = reflect_get_completion_active_rule_descriptions($course, $cm);
-        $this->assertCount(1, $rules);
-
-        // Initially false.
-        $state = reflect_get_completion_state($course, $cm, $student->id, false);
-        $this->assertFalse($state);
-
-        // Add response.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
-        $q1 = $generator->create_question($reflect->id, ['responsetype' => 'text']);
-        $DB->insert_record('reflect_responses', [
-            'reflectid' => $reflect->id, 'questionid' => $q1->id, 'userid' => $student->id,
-            'value' => null, 'timecreated' => time(), 'timemodified' => time(),
-        ]);
-
-        // Now true.
-        $state = reflect_get_completion_state($course, $cm, $student->id, false);
-        $this->assertTrue($state);
+        $this->assertSame(
+            [get_string('completiondetail:submit', 'mod_reflect')],
+            reflect_get_completion_active_rule_descriptions($cminfo)
+        );
+        $this->assertSame([], reflect_get_completion_active_rule_descriptions((object) ['customdata' => []]));
     }
 
     /**

@@ -120,49 +120,52 @@ function reflect_update_grades(stdClass $instance, int $userid = 0, bool $nullif
 }
 
 /**
- * Obtains the automatic completion state for this reflect based on any conditions
- * in reflect settings.
+ * Called by Moodle when building cm_info. Publishes the completion rule so that
+ * \mod_reflect\completion\custom_completion knows whether it is switched on, and so that the
+ * course page can describe it.
  *
- * @param stdClass $course Course
- * @param cm_info|stdClass $cm Course-module
- * @param int $userid User ID
- * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- * @return bool True if completed, false if not, $type if conditions not set.
+ * @param stdClass $coursemodule The raw course_modules row.
+ * @return cached_cm_info|false A populated info object, or false on failure.
  */
-function reflect_get_completion_state(stdClass $course, cm_info|stdClass $cm, int $userid, bool $type): bool {
+function reflect_get_coursemodule_info(stdClass $coursemodule): cached_cm_info|false {
     global $DB;
 
-    $reflect = $DB->get_record('reflect', ['id' => $cm->instance], '*', MUST_EXIST);
-
-    // If the rule is active.
-    if (!empty($reflect->completionsubmit)) {
-        // Has the user submitted at least one response?
-        $hasresponses = $DB->record_exists('reflect_responses', ['reflectid' => $reflect->id, 'userid' => $userid]);
-        if (!$hasresponses) {
-            return false;
-        }
-        return true;
+    $fields = 'id, name, intro, introformat, completionsubmit';
+    $instance = $DB->get_record('reflect', ['id' => $coursemodule->instance], $fields);
+    if (!$instance) {
+        return false;
     }
 
-    return $type;
+    $info = new cached_cm_info();
+    $info->name = $instance->name;
+
+    // Once a module defines this callback, core no longer builds the course page description
+    // itself, so "Display description on course page" does nothing unless it is set here.
+    // Filters are skipped on purpose: this is cached, and they run when it is displayed.
+    if (!empty($coursemodule->showdescription)) {
+        $info->content = format_module_intro('reflect', $instance, $coursemodule->id, false);
+    }
+
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $info->customdata['customcompletionrules']['completionsubmit'] = (int) $instance->completionsubmit;
+    }
+
+    return $info;
 }
 
 /**
- * Returns the custom completion rules for this module.
+ * Describes the active custom completion rules.
  *
- * @param stdClass $course Course
- * @param cm_info|stdClass $cm Course-module
- * @return array
+ * @param stdClass|cm_info $cm The course module info.
+ * @return array An array of active completion rule descriptions.
  */
-function reflect_get_completion_active_rule_descriptions(stdClass $course, cm_info|stdClass $cm): array {
-    global $DB;
+function reflect_get_completion_active_rule_descriptions(stdClass|cm_info $cm): array {
+    $descriptions = [];
 
-    $reflect = $DB->get_record('reflect', ['id' => $cm->instance], '*', MUST_EXIST);
-    $rules = [];
-
-    if (!empty($reflect->completionsubmit)) {
-        $rules[] = get_string('completionsubmit', 'mod_reflect');
+    $rules = $cm->customdata['customcompletionrules'] ?? [];
+    if (!empty($rules['completionsubmit'])) {
+        $descriptions[] = get_string('completiondetail:submit', 'mod_reflect');
     }
 
-    return $rules;
+    return $descriptions;
 }
