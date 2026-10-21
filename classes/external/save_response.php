@@ -30,6 +30,9 @@ use context_module;
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_response extends external_api {
+    /** @var int Seconds to wait for the student's lock before refusing the save. */
+    private const LOCK_TIMEOUT_SECONDS = 5;
+
     /**
      * Describe the parameters expected by this function.
      *
@@ -89,38 +92,52 @@ class save_response extends external_api {
 
         $now = time();
 
-        // Check if a response already exists for this user and question.
-        $record = $DB->get_record(
-            'reflect_responses',
-            ['questionid' => $question->id, 'userid' => $USER->id]
-        );
+        // The lookup and the insert or update run under a lock per student and question: the responses
+        // table has no unique index, so two saves of the same answer arriving together (an autosave and
+        // the submit, two tabs) would both find nothing and both insert, leaving two rows for one
+        // question that the grade and the report then count twice.
+        $lock = \core\lock\lock_config::get_lock_factory('mod_reflect')
+            ->get_lock('response_' . $question->id . '_' . $USER->id, self::LOCK_TIMEOUT_SECONDS);
+        if (!$lock) {
+            throw new \moodle_exception('responsebusy', 'mod_reflect');
+        }
 
-        if ($record) {
-            // Update only provided fields.
-            if ($params['value'] !== null) {
-                $record->value = $params['value'];
+        try {
+            // Check if a response already exists for this user and question.
+            $record = $DB->get_record(
+                'reflect_responses',
+                ['questionid' => $question->id, 'userid' => $USER->id]
+            );
+
+            if ($record) {
+                // Update only provided fields.
+                if ($params['value'] !== null) {
+                    $record->value = $params['value'];
+                }
+                if ($params['responsetext'] !== null) {
+                    $record->responsetext = $params['responsetext'];
+                }
+                if ($params['comment'] !== null && $instance->allowcomment) {
+                    $record->comment = $params['comment'];
+                }
+                $record->timemodified = $now;
+                $DB->update_record('reflect_responses', $record);
+            } else {
+                // Insert new response.
+                $record = (object) [
+                    'reflectid'    => $instance->id,
+                    'questionid'   => $question->id,
+                    'userid'       => $USER->id,
+                    'value'        => $params['value'],
+                    'responsetext' => $params['responsetext'],
+                    'comment'      => ($instance->allowcomment ? $params['comment'] : null),
+                    'timecreated'  => $now,
+                    'timemodified' => $now,
+                ];
+                $DB->insert_record('reflect_responses', $record);
             }
-            if ($params['responsetext'] !== null) {
-                $record->responsetext = $params['responsetext'];
-            }
-            if ($params['comment'] !== null && $instance->allowcomment) {
-                $record->comment = $params['comment'];
-            }
-            $record->timemodified = $now;
-            $DB->update_record('reflect_responses', $record);
-        } else {
-            // Insert new response.
-            $record = (object) [
-                'reflectid'    => $instance->id,
-                'questionid'   => $question->id,
-                'userid'       => $USER->id,
-                'value'        => $params['value'],
-                'responsetext' => $params['responsetext'],
-                'comment'      => ($instance->allowcomment ? $params['comment'] : null),
-                'timecreated'  => $now,
-                'timemodified' => $now,
-            ];
-            $DB->insert_record('reflect_responses', $record);
+        } finally {
+            $lock->release();
         }
 
         // Trigger grade update for the whole activity.

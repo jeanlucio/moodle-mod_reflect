@@ -67,6 +67,7 @@ $string['reflect:view'] = 'View a Reflect activity';
 $string['reflect:viewreports'] = 'View all student responses';
 $string['reflectsettings'] = 'Reflect settings';
 $string['resetreflectuserdata'] = 'Delete all the students\' responses';
+$string['responsebusy'] = 'Your previous answer is still being saved; please try again in a moment.';
 $string['responses'] = 'Responses';
 $string['responsetype'] = 'Response type';
 $string['responsetype_numeric'] = 'Numeric (0–100 slider)';

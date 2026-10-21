@@ -140,4 +140,81 @@ final class external_test extends advanced_testcase {
 
         $this->assertFalse($DB->record_exists('reflect_questions', ['id' => $q1->id]));
     }
+
+    /**
+     * Creates an activity with one numeric question and a student who is logged in.
+     *
+     * @return array [activity, question, student]
+     */
+    private function create_activity_for_a_student(): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/reflect/tests/fixtures/recording_lock_factory.php');
+
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
+        $question = $generator->create_question($reflect->id, ['responsetype' => 'numeric']);
+        $this->setUser($student);
+
+        return [$reflect, $question, $student];
+    }
+
+    /**
+     * The lookup and the write of a response sit between the acquire and the release of the student's lock
+     * for that question. PHPUnit cannot race two saves; what it shows is the order of the locks, which is
+     * what makes a second simultaneous save wait for the first row before it looks for an earlier one.
+     */
+    public function test_a_response_is_saved_under_the_students_lock(): void {
+        [$reflect, $question, $student] = $this->create_activity_for_a_student();
+        \mod_reflect_recording_lock_factory::install();
+
+        \mod_reflect\external\save_response::execute($reflect->cmid, $question->id, 40, '', '');
+
+        $key = 'response_' . $question->id . '_' . $student->id;
+        $this->assertSame(
+            ["acquire {$key}", "release {$key}"],
+            \mod_reflect_recording_lock_factory::events_for('mod_reflect')
+        );
+    }
+
+    /**
+     * When the lock cannot be had the save is refused and nothing is stored; the same save works afterwards.
+     */
+    public function test_a_busy_lock_stores_nothing_and_the_save_can_be_retried(): void {
+        global $DB;
+
+        [$reflect, $question, $student] = $this->create_activity_for_a_student();
+        \mod_reflect_recording_lock_factory::install(['mod_reflect/response_' . $question->id . '_' . $student->id]);
+
+        try {
+            \mod_reflect\external\save_response::execute($reflect->cmid, $question->id, 40, '', '');
+            $this->fail('A save that cannot take the lock must be refused.');
+        } catch (\moodle_exception $exception) {
+            $this->assertSame('responsebusy', $exception->errorcode);
+        }
+        $this->assertSame(0, $DB->count_records('reflect_responses'));
+
+        \mod_reflect_recording_lock_factory::install();
+        \mod_reflect\external\save_response::execute($reflect->cmid, $question->id, 40, '', '');
+        $this->assertSame(1, $DB->count_records('reflect_responses'));
+    }
+
+    /**
+     * Two saves that reach the server one after the other, the case the lock turns the simultaneous one
+     * into: the second finds the first and updates it, so the question keeps a single row.
+     */
+    public function test_saving_twice_keeps_a_single_row_per_question(): void {
+        global $DB;
+
+        [$reflect, $question, $student] = $this->create_activity_for_a_student();
+
+        \mod_reflect\external\save_response::execute($reflect->cmid, $question->id, 40, '', '');
+        \mod_reflect\external\save_response::execute($reflect->cmid, $question->id, 70, '', '');
+
+        $rows = $DB->get_records('reflect_responses', ['questionid' => $question->id, 'userid' => $student->id]);
+        $this->assertCount(1, $rows);
+        $this->assertEquals(70, reset($rows)->value);
+    }
 }
