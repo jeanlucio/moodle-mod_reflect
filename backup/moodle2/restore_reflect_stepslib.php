@@ -93,7 +93,8 @@ class restore_reflect_activity_structure_step extends restore_activity_structure
         $data->userid = $this->get_mappingid('user', $data->userid);
 
         $newitemid = $DB->insert_record('reflect_responses', $data);
-        // We don't need to map responses.
+        // Registered so the activity task can decode the links in the response text and comment.
+        $this->set_mapping('reflect_responses', $oldid, $newitemid);
     }
 
     /**

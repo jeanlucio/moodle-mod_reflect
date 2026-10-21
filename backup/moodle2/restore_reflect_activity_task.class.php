@@ -70,6 +70,11 @@ class restore_reflect_activity_task extends restore_activity_task {
 
         $contents[] = new restore_decode_content('reflect', ['intro'], 'reflect');
         $contents[] = new restore_decode_content('reflect_questions', ['question'], 'reflect_questions');
+        $contents[] = new restore_decode_content(
+            'reflect_responses',
+            ['responsetext', 'comment'],
+            'reflect_responses'
+        );
 
         return $contents;
     }

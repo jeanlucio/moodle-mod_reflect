@@ -171,4 +171,42 @@ final class backup_test extends advanced_testcase {
 
         return $newcourseid;
     }
+
+    /**
+     * The links inside a student's response survive a restore: the backup encodes every link in the text
+     * columns it writes, and only the activity's intro and the questions were decoded back.
+     */
+    public function test_backup_and_restore_decodes_links_in_responses(): void {
+        global $DB, $USER, $CFG;
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $reflect = $this->getDataGenerator()->create_module('reflect', ['course' => $course->id]);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_reflect');
+        $question = $generator->create_question($reflect->id, ['responsetype' => 'text']);
+        $link = $CFG->wwwroot . '/course/view.php?id=' . $course->id;
+        $DB->insert_record('reflect_responses', [
+            'reflectid' => $reflect->id,
+            'questionid' => $question->id,
+            'userid' => $USER->id,
+            'value' => null,
+            'responsetext' => 'I used ' . $link . ' to study.',
+            'comment' => 'See ' . $link,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+
+        $newcourseid = $this->backup_and_restore($course);
+
+        $newreflect = $DB->get_record('reflect', ['course' => $newcourseid], '*', MUST_EXIST);
+        $response = $DB->get_record('reflect_responses', ['reflectid' => $newreflect->id], '*', MUST_EXIST);
+        $newlink = $CFG->wwwroot . '/course/view.php?id=' . $newcourseid;
+        $this->assertStringContainsString($newlink, $response->responsetext);
+        $this->assertStringContainsString($newlink, $response->comment);
+        $this->assertStringNotContainsString('$@', $response->responsetext . $response->comment);
+    }
 }
