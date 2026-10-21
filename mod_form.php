@@ -73,13 +73,43 @@ class mod_reflect_mod_form extends moodleform_mod {
     /**
      * Add custom completion rules.
      *
+     * The element name carries the form's suffix. The core shows this form on the "Default activity
+     * completion" page with the suffix "_reflect" and drops any custom rule whose name lacks it,
+     * which would also erase the rule from the defaults of every new activity.
+     *
      * @return array Array of string IDs of added items, empty array if none
      */
     public function add_completion_rules(): array {
         $mform = $this->_form;
+        $name = 'completionsubmit' . $this->get_suffix();
 
-        $mform->addElement('checkbox', 'completionsubmit', get_string('completionsubmit', 'mod_reflect'));
-        return ['completionsubmit'];
+        $mform->addElement('checkbox', $name, get_string('completionsubmit', 'mod_reflect'));
+        return [$name];
+    }
+
+    /**
+     * Stores an unticked completion rule as 0.
+     *
+     * A browser does not send an unticked checkbox, so the rule is missing from the submitted data and
+     * the update would leave the old 1 in the database. The rule only applies with automatic tracking,
+     * so it is also cleared when the teacher switches to another tracking mode.
+     *
+     * @param \stdClass $data Submitted data.
+     * @return void
+     */
+    public function data_postprocessing($data): void {
+        parent::data_postprocessing($data);
+
+        if (empty($data->completionunlocked)) {
+            return;
+        }
+
+        $suffix = $this->get_suffix();
+        $automatic = !empty($data->{'completion' . $suffix})
+            && (int) $data->{'completion' . $suffix} === COMPLETION_TRACKING_AUTOMATIC;
+        if (!$automatic || empty($data->{'completionsubmit' . $suffix})) {
+            $data->{'completionsubmit' . $suffix} = 0;
+        }
     }
 
     /**
@@ -89,6 +119,6 @@ class mod_reflect_mod_form extends moodleform_mod {
      * @return bool
      */
     public function completion_rule_enabled($data): bool {
-        return (!empty($data['completionsubmit']) && $data['completionsubmit'] != 0);
+        return !empty($data['completionsubmit' . $this->get_suffix()]);
     }
 }
