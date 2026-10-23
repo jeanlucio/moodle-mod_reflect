@@ -34,4 +34,14 @@ class course_module_viewed extends base_event {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
+
+    /**
+     * Maps the logged object id to the activity instance the restore creates.
+     *
+     * @return array
+     */
+    #[\Override]
+    public static function get_objectid_mapping(): array {
+        return ['db' => 'reflect', 'restore' => 'reflect'];
+    }
 }
