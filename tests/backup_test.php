@@ -27,8 +27,6 @@ namespace mod_reflect;
 
 use advanced_testcase;
 
-
-
 /**
  * Backup and restore tests for mod_reflect.
  *
